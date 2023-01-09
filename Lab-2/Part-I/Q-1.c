@@ -24,3 +24,4 @@ int main(){
     wait(NULL);
     return 0;
 }
+// Minimum lines of C code: 20 
