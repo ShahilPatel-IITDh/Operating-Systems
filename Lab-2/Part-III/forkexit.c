@@ -113,6 +113,7 @@ int do_fork()
   new_pid = get_free_pid();
   rmc->mp_pid = new_pid;	/* assign pid to child */
   printf("Minix: PID %d created\n", rmc->mp_pid);			/* ------Printing the PID of new created Process----- */
+  
   memset(&m, 0, sizeof(m));
   m.m_type = VFS_PM_FORK;
   m.VFS_PM_ENDPT = rmc->mp_endpoint;
@@ -242,7 +243,7 @@ int do_exit()
   }
   else {
       exit_proc(mp, m_in.m_lc_pm_exit.status, FALSE /*dump_core*/);
-      printf("Minix: PID %d exited\n", mp->mp_pid);
+      printf("Minix: PID %d exited\n", mp->mp_pid); 			/* -----Printing PID of process that has exited----- */
   }
   return(SUSPEND);		/* can't communicate from beyond the grave */
 }
@@ -728,4 +729,3 @@ register struct mproc *rmp;	/* tells which process is exiting */
   rmp->mp_child_stime = 0;
   procs_in_use--;
 }
-
