@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ipc.h>
-#include <math.h>
 
 char* itoa(int val, int base);
 
@@ -13,10 +12,12 @@ int main(int argc, char* argv[]) {
     }
         
     int argument = argc-1;
+    int arg2 = argc-2;
     int n = atoi(argv[argument]);
-    int ans = pow(n, 2);
 
-    int process_id = getpid();
+    int ans = n*n;
+
+    unsigned int process_id = getpid();
     printf("Square: Current process id: %u, Current result: %d\n", process_id, ans);
 
     char* v[argc];
@@ -24,11 +25,14 @@ int main(int argc, char* argv[]) {
         v[i-1] = argv[i];
     }
         
-    v[argc-2] = itoa(ans, 10);
+    v[arg2] = itoa(ans, 10);
     v[argument] = NULL;
     
     execvp(v[0], v);
 }
+
+
+#include <math.h>
 
 char* itoa(int val, int base){
     

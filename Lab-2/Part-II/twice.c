@@ -12,10 +12,11 @@ int main(int argc, char* argv[]) {
     }
         
     int argument = argc-1;
+    int arg2 = argc-2;
     int n = atoi(argv[argument]);
     int ans = 2*n;
 
-    int process_id = getpid();
+    unsigned int process_id = getpid();
     printf("Twice: Current process id: %u, Current result: %d\n", process_id, ans);
 
     char* v[argc];
@@ -23,7 +24,7 @@ int main(int argc, char* argv[]) {
         v[i-1] = argv[i];
     }
         
-    v[argc-2] = itoa(ans, 10);
+    v[arg2] = itoa(ans, 10);
     v[argument] = NULL;
     
     execvp(v[0], v);

@@ -11,9 +11,10 @@ int main(int argc, char* argv[]) {
         exit(0);
     }   
     int argument = argc-1;
+    int arg2 = argc-2;
     int n = atoi(argv[argument]);
     int ans = n/2;
-    int process_id = getpid();
+    unsigned int process_id = getpid();
 
     printf("Half: Current process id: %u, Current result: %d\n", process_id, ans);
 
@@ -22,7 +23,7 @@ int main(int argc, char* argv[]) {
         v[i-1] = argv[i];
     }
         
-    v[argc-2] = itoa(ans, 10);
+    v[arg2] = itoa(ans, 10);
     v[argument] = NULL;
     
     execvp(v[0], v);
