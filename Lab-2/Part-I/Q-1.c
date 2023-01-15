@@ -6,10 +6,7 @@
 int main(){
     char str[] = "Hello World";
     int pid = 0;
-
     for(int i=0; i<11; i++){
-
-        // Print for the child process only.
         if(pid == 0){
             printf("%c (pid = %d)\n", str[i],(int) getpid());
             // Select an random integer between 1 to 4
