@@ -4,7 +4,7 @@
 #include <string.h>
 #include <sys/ipc.h>
 
-char* itoa(int val, int base);
+char* int_to_ascii(int val, int base);
 
 int main(int argc, char* argv[]) {
     if (argc == 1){
@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
         v[i-1] = argv[i];
     }
         
-    v[arg2] = itoa(ans, 10);
+    v[arg2] = int_to_ascii(ans, 10);
     v[argument] = NULL;
     
     execvp(v[0], v);
@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 
 #include <math.h>
 
-char* itoa(int val, int base){
+char* int_to_ascii(int val, int base){
     
     static char buf[32] = {0};    
     int i = 30;    
