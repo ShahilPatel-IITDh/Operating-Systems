@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>  
-
 int main(){
     char str[] = "Hello World";
     int pid = 0;
@@ -12,13 +11,16 @@ int main(){
             // Select an random integer between 1 to 4
             int n = (rand()%4) + 1;
             sleep(n);
-
             if(i != 10){
             	pid = fork();
             }
         }
+        else if(pid>0){
+            // wait for termination of child, NULL signifies that fork = 0
+            wait(NULL);
+            exit(0);
+        }
     }
-    wait(NULL);
     return 0;
 }
-// Minimum lines of C code: 22
+// Minimum lines of C code: 23
