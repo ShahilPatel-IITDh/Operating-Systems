@@ -1,11 +1,11 @@
 half: twice 
-	gcc half.c -o half
+	clang half.c -o half
 
 twice: square
-	gcc twice.c -o twice
+	clang twice.c -o twice
 
 square: 
-	gcc square.c -o square
+	clang square.c -o square
 
 clean:
 	rm -f twice
