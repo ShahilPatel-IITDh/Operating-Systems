@@ -1,4 +1,5 @@
 #!/bin/sh
 ./fstime.sh &
-./syscall.sh &
+./pipe.sh &
+./spawn.sh &
 wait
