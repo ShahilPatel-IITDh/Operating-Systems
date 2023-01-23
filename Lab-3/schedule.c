@@ -328,7 +328,7 @@ static int schedule_process(struct schedproc * rmp, unsigned flags)
     // if parent process' current priority is greater than 
 	if(rmp->priority >= USER_Q){
         // rmp->endpoint = parent process' endpoint id
-		printf("Minix: PID %d swapped in\n", _ENDPOINT_P(rmp->endpoint));
+		printf("(200010039, 200010041)Minix: PID %d swapped in\n", _ENDPOINT_P(rmp->endpoint));
 	}
 	
 	return err;
