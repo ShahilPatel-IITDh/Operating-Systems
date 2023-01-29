@@ -1,14 +1,20 @@
 #include<stdio.h>
  
-int main()
+int main(int argc, char *argv[])
 {
- 
+    // Getting inputs from files
+    if(argc < 3){  
+        printf("Please specify the Input and Output file names through command line.\n");  
+    } 
+    FILE *in_file  = fopen(argv[1], "r"); // read only 
+    FILE *out_file = fopen(argv[2], "w"); // write only
+
     int cnt,j,n,t,remain,flag=0,tq;
     int wt=0,tat=0,at[10],bt[10],rt[10];
     printf("Enter Total Process:\t ");
     scanf("%d",&n);
     remain=n;
-    for(cnt=0;cnt<n;cnt++){
+    for(cnt=0; cnt<n; cnt++){
         printf("Enter Arrival Time and Burst Time for Process Process Number %d :",cnt+1);
         scanf("%d",&at[cnt]);
         scanf("%d",&bt[cnt]);
