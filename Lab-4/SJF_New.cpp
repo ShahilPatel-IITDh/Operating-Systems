@@ -15,7 +15,7 @@ int getTurnaroundTime(int completion_time, int arrivalTime){
 //class for process
 
 float calcAvg(int a, int b){
-    return float(a/b);
+    return (a/b);
 }
 
 class Process{
@@ -322,12 +322,13 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
 
         sum_turnaround_time += p.turnaround_time;
         sum_response_time += p.response_time;
+
         cout<<"Process "<<p.PID<<" completion time: "<<p.completion_time<<" arrival time: "<<p.arrivalTime<<" waiting time: "<<p.waiting_time<<" turnaround time: "<<p.turnaround_time<<" response time: "<<p.response_time<<endl;
     }
 
-    avg_wait_time = (float)calcAvg(sum_wait_time, numberOfProcess);
-    avg_turnaround_time = (float)calcAvg(sum_turnaround_time, numberOfProcess);
-    avg_response_time = (float)calcAvg(sum_response_time, numberOfProcess);
+    avg_wait_time = calcAvg(sum_wait_time, numberOfProcess);
+    avg_turnaround_time = calcAvg(sum_turnaround_time, numberOfProcess);
+    avg_response_time = calcAvg(sum_response_time, numberOfProcess);
 
     cout<<"Average waiting time: "<<avg_wait_time<<endl;
     cout<<"Average turnaround time: "<<avg_turnaround_time<<endl;
