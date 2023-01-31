@@ -4,7 +4,19 @@
 #include <fstream>
 using namespace std;
 
+
+int getWaitingTime(int completion_time, int arrivalTime, int cpu_burst_time){
+    return completion_time - arrivalTime - cpu_burst_time;
+}
+
+int getTurnaroundTime(int completion_time, int arrivalTime){
+    return completion_time - arrivalTime;
+}
 //class for process
+
+float calcAvg(int a, int b){
+    return float(a/b);
+}
 
 class Process{
     public:
@@ -226,7 +238,8 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
         else{
             cpu_process.burst_time--;
             cpu_process.CPU_Burst[cpu_process.CPU_Burst.size()-1]--;
-            if(cpu_process.CPU_Burst[cpu_process.CPU_Burst.size()-1] == 0){
+            int end_point = cpu_process.CPU_Burst.size()-1;
+            if(cpu_process.CPU_Burst[end_point] == 0){
                 if(cpu_process.IO_Burst.size() == 0){
                     for(int k=0; k<numberOfProcess; k++){
                         if(process[k].PID == cpu_process.PID){
@@ -290,18 +303,31 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
        }
     }
     //print the completion time of each process and its pid
-    int avg_wait_time=0, avg_turnaround_time=0, avg_response_time=0;
+    int sum_wait_time=0;
+    int sum_turnaround_time=0;
+    int sum_response_time=0;
+
+    float avg_wait_time;
+    float avg_turnaround_time;
+    float avg_response_time;
+
     for(auto p: process){
-        p.waiting_time = p.completion_time - p.arrivalTime - p.cpu_burst_time;
-        avg_wait_time += p.waiting_time;
-        p.turnaround_time = p.completion_time - p.arrivalTime;
-        avg_turnaround_time += p.turnaround_time;
-        avg_response_time += p.response_time;
+        p.waiting_time = getWaitingTime(p.completion_time, p.arrivalTime, p.cpu_burst_time);
+        // p.waiting_time = p.completion_time - p.arrivalTime - p.cpu_burst_time;
+
+        sum_wait_time += p.waiting_time;
+
+        p.turnaround_time = getTurnaroundTime(p.completion_time, p.arrivalTime);
+        // p.turnaround_time = p.completion_time - p.arrivalTime;
+
+        sum_turnaround_time += p.turnaround_time;
+        sum_response_time += p.response_time;
         cout<<"Process "<<p.PID<<" completion time: "<<p.completion_time<<" arrival time: "<<p.arrivalTime<<" waiting time: "<<p.waiting_time<<" turnaround time: "<<p.turnaround_time<<" response time: "<<p.response_time<<endl;
     }
-    avg_wait_time /= numberOfProcess;
-    avg_turnaround_time /= numberOfProcess;
-    avg_response_time /= numberOfProcess;
+
+    avg_wait_time = (float)calcAvg(sum_wait_time, numberOfProcess);
+    avg_turnaround_time = (float)calcAvg(sum_turnaround_time, numberOfProcess);
+    avg_response_time = (float)calcAvg(sum_response_time, numberOfProcess);
 
     cout<<"Average waiting time: "<<avg_wait_time<<endl;
     cout<<"Average turnaround time: "<<avg_turnaround_time<<endl;
