@@ -1,150 +1,154 @@
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
 #include <queue>
-#include <fstream>
 #include <vector>
-
+#include <fstream>
 using namespace std;
 
-//class template for process
+//class for process
+
 class Process{
     public:
+    bool firstOccurence; 
+    int waiting_time, turnaround_time, response_time, completion_time, remaining_time;
     vector<int> CPU_Burst, IO_Burst;
-    bool firstOccurence;
-    int waiting_time, turnaround_time, response_time, completion_time,remaining_time;
-    int pid, ArrivalTime, burst_time, cpu_burst_time; 
+    int PID, arrivalTime, burst_time, cpu_burst_time;
 };
 
+
 int main(int argc, char *argv[]){
-
-    //check if the input file is given or not
-    if(argc!=2){
-        cout<<"Please enter the input file name in command line"<<endl;
+    //open the file from input argument 1 in read mode
+    if(argc < 2){
+        cout<<"Please provide input file through command line"<<endl;
         return 0;
     }
-    
-    // Open the input file from input argument 1 in read mode
+
     FILE *inputFile = fopen(argv[1], "r");
-
-    // If File is not found then print
-    if(!argv[1]){
-        cout<<"Input file not found"<<endl;
+    //if file is not found
+    if(!inputFile){
+        cout<<"File not found"<<endl;
         return 0;
     }
-
     // DeadC
     bool flag1 = false;
     if(flag1==true){
         int test = 0;
         Process x;
-        x.pid = 0;
         x.firstOccurence = true;
         // pid++;
-        cout<<"x.pid = "<<x.pid<<endl;
+        cout<<"x.pid = "<<x.PID<<endl;
     }
-
     //vector to store the process
     vector<Process> process;
     //now read the file line by line upto the end of file using while loop
+
+    // DeadC
+    bool flag2 = false;
+    if(flag2==true){
+        int test = 0;
+        Process x;
+        x.firstOccurence = true;
+        // pid++;
+        cout<<"x.pid = "<<x.PID<<endl;
+    }
+
     int pid=1;
+
 
     while(!feof(inputFile)){
         //create a process object for each process
         Process p;
-        p.pid = pid;
+        p.PID = pid;
         p.firstOccurence = true;
         pid++;
-        // first line of each process contains arrival time and consecutive cpu burst and io burst
-        //first element is arrival time
-        int arrival_time;
-        fscanf(inputFile, "%d", &arrival_time);
 
         // DeadC
-        bool flag2 = false;
-        if(flag2==true){
+        bool flag3 = false;
+        if(flag3==true){
             int test = 0;
             Process x;
-            x.pid = pid;
             x.firstOccurence = true;
-            pid++;
-            cout<<"x.pid = "<<x.pid<<endl;
+            // pid++;
+            cout<<"x.pid = "<<x.PID<<endl;
         }
-        
-        p.ArrivalTime = arrival_time;
+
+        // first line of each process contains arrival time and consecutive cpu burst and io burst
+        //first element is arrival time
+
+        int arrival_time_val;
+        fscanf(inputFile, "%d", &arrival_time_val);
+
+        p.arrivalTime = arrival_time_val;
         //now read the cpu burst and io burst
-        int cpu_burst_val;
-        int io_burst_val;
-
-        // End of line is indicated by -1
-        while(fscanf(inputFile, "%d", &cpu_burst_val)){
-            if(cpu_burst_val!=-1){
-                p.CPU_Burst.emplace_back(cpu_burst_val);
-                fscanf(inputFile, "%d", &io_burst_val);
-
-                if(io_burst_val!=-1){
-                    p.IO_Burst.emplace_back(io_burst_val);
+        int cpu_burst, io_burst;
+        //end of line is indicated by -1
+        while(fscanf(inputFile, "%d", &cpu_burst) && cpu_burst != -1){
+            if(cpu_burst!=-1){
+                p.CPU_Burst.push_back(cpu_burst);
+                fscanf(inputFile, "%d", &io_burst);
+                if(io_burst!=-1){
+                    p.IO_Burst.push_back(io_burst);
                 }
                 else{
                     break;
                 }
             }
-            else{
-                break;
-            }
         }
-        // Reverse the cpu burst and io burst vector
-        reverse(p.CPU_Burst.begin(), p.CPU_Burst.end());
 
+        // reverse the cpu burst and io burst vector
+        reverse(p.CPU_Burst.begin(), p.CPU_Burst.end());
         reverse(p.IO_Burst.begin(), p.IO_Burst.end());
 
-        int Total_burst_time = 0;
-        int CPU_Burst_size = p.CPU_Burst.size();
-
-        // Sum up the total burst time to get the burst time of the process
-
-        for(int i=0;i<CPU_Burst_size;i++){
-            Total_burst_time += (p.CPU_Burst[i]);
+        int total_burst_time = 0;
+        for(int i=0;i<p.CPU_Burst.size();i++){
+            total_burst_time += p.CPU_Burst[i];
         }
-        // p.burst_time = accumulate(p.CPU_Burst.begin(), p.CPU_Burst.end(), 0);
+        p.burst_time = total_burst_time;
         p.cpu_burst_time = p.burst_time;
 
-        // Push the process in the vector
-        process.emplace_back(p);
+        // DeadC
+        bool flag4 = false;
+        if(flag4==true){
+            int test = 0;
+            Process x;
+            x.firstOccurence = true;
+            // pid++;
+            cout<<"x.pid = "<<x.PID<<endl;
+        }
+
+        //push the process in the vector
+        process.push_back(p);
     }
 
     // now sort the process according to arrival time
-    sort(process.begin(), process.end(), [](Process x, Process y){
-        return x.ArrivalTime < y.ArrivalTime;
+    sort(process.begin(), process.end(), [](Process a, Process b){
+        return a.arrivalTime < b.arrivalTime;
     });
 
-    int processSize = process.size();
-
-    Process CPU_Process;
-    Process IO_Process;
-
     // DeadC
-    bool flag3 = false;
-    if(flag3==true){
+    bool flag5 = false;
+    if(flag5==true){
         int test = 0;
         Process x;
-        x.pid = pid;
         x.firstOccurence = true;
-        pid++;
-        cout<<"x.pid = "<<x.pid<<endl;
+        // pid++;
+        cout<<"x.pid = "<<x.PID<<endl;
     }
 
-    bool idleCPU = true;
-    bool idleIO = true;
+    bool cpu_idle = true;
+    bool io_idle = true;
     bool not_finished = true;
 
+    int numberOfProcess = process.size();
+    Process cpu_process, io_process;
+    
     // DeadC
-    bool flag4 = false;
-    if(flag4==true){
+    bool flag6 = false;
+    if(flag6==true){
         int test = 0;
         Process x;
-        x.pid = pid;
         x.firstOccurence = true;
-        pid++;
-        cout<<"x.pid = "<<x.pid<<endl;
+        // pid++;
+        cout<<"x.pid = "<<x.PID<<endl;
     }
 
     // priority queue of pair of int and process
@@ -152,214 +156,113 @@ int main(int argc, char *argv[]){
     // comparator is used to sort the queue according to burst time
     auto cmp = [](pair<int, Process> &a, pair<int, Process> &b) {
         if(a.first == b.first){
-            return a.second.pid > b.second.pid;
+            return a.second.PID > b.second.PID;
         }
         return a.first > b.first;
     };
 
+    // DeadC
+    bool flag7 = false;
+    if(flag7==true){
+        int test = 0;
+        Process x;
+        x.firstOccurence = true;
+        // pid++;
+        cout<<"x.pid = "<<x.PID<<endl;
+    }
+    
+
 priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> cpu_queue(cmp);
 priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io_queue(cmp);
 
-    // DeadC
-    bool flag5 = false;
-    if(flag5==true){
-        int test = 0;
-        Process x;
-        x.pid = pid;
-        x.firstOccurence = true;
-        pid++;
-        cout<<"x.pid = "<<x.pid<<endl;
-    }
-    
     int time = 0;
     //cpu shoudn't be idle
     int i=0;
-
-    // DeadC
-    bool flag6 = false;
-    if(flag6==true){
-        int test = 0;
-        Process x;
-        x.pid = pid;
-        x.firstOccurence = true;
-        pid++;
-        cout<<"x.pid = "<<x.pid<<endl;
-    }
-
-
     while(not_finished){
-        while(i<processSize){
-            if(process[i].ArrivalTime<=time){
-                pair<int, Process> pr = make_pair(process[i].burst_time, process[i]);
-                cpu_queue.push(pr);
-            }
+        while(i<numberOfProcess && process[i].arrivalTime <= time){
+            cpu_queue.push({process[i].burst_time, process[i]});
             i++;
         }
-
-        if(idleCPU){
+        if(cpu_idle){
             if(!cpu_queue.empty()){
-                CPU_Process = cpu_queue.top().second;
+                cpu_process = cpu_queue.top().second;
                 cpu_queue.pop();
-
-                // DeadC
-                bool flag7 = false;
-                if(flag7==true){
-                    int test = 0;
-                    Process x;
-                    x.pid = pid;
-                    x.firstOccurence = true;
-                    pid++;
-                    cout<<"x.pid = "<<x.pid<<endl;
-                }
-
-                if(CPU_Process.firstOccurence == true){
-
-                    for(int k=0; k<processSize; k++){
-
-                        if(process[k].pid == CPU_Process.pid){
-                            process[k].response_time = time - process[k].ArrivalTime;
-                            CPU_Process.firstOccurence = false;
+                if(cpu_process.firstOccurence){
+                    for(int k=0; k<numberOfProcess; k++){
+                        if(process[k].PID == cpu_process.PID){
+                            process[k].response_time = time - process[k].arrivalTime;
+                            cpu_process.firstOccurence = false;
                             break;
-                        }
-
-                        // DeadC
-                        if(process[k].pid < CPU_Process.pid){
-                            int test = 0;
-                            test++;
-                            test*=2;
-                            test--;
                         }
                     }
                 }
-                // DeadC
-                bool flagextra = false;
-                if(flagextra==true){
-                    int test = 0;
-                    Process x;
-                    x.pid = pid;
-                    x.firstOccurence = true;
-                    pid++;
-                    cout<<"x.pid = "<<x.pid<<endl;
-                }
-                
-                idleCPU = false;
+                cpu_idle = false;
                 continue;
             }
         }
         else{
-            CPU_Process.burst_time--;
-            int bst_size = CPU_Process.CPU_Burst.size();
-            CPU_Process.CPU_Burst[bst_size-1]--;
-
-            // DeadC
-            bool flag8 = false;
-            if(flag8==true){
-                int test = 0;
-                Process x;
-                x.pid = pid;
-                x.firstOccurence = true;
-                pid++;
-                cout<<"x.pid = "<<x.pid<<endl;
-            }
-
-
-            if(CPU_Process.CPU_Burst[bst_size-1] == 0){
-
-                int io_bst_size = CPU_Process.IO_Burst.size();
-
-                if(io_bst_size == 0){
-                    for(int k=0; k<processSize; k++){
-                        if(process[k].pid == CPU_Process.pid){
+            cpu_process.burst_time--;
+            cpu_process.CPU_Burst[cpu_process.CPU_Burst.size()-1]--;
+            if(cpu_process.CPU_Burst[cpu_process.CPU_Burst.size()-1] == 0){
+                if(cpu_process.IO_Burst.size() == 0){
+                    for(int k=0; k<numberOfProcess; k++){
+                        if(process[k].PID == cpu_process.PID){
                             process[k].completion_time = time+1;
                             break;
                         }
                     }
-                }
-                // DeadC
-                bool flag9 = false;
-                if(flag9==true){
-                    int test = 0;
-                    Process x;
-                    x.pid = pid;
-                    x.firstOccurence = true;
-                    pid++;
-                    cout<<"x.pid = "<<x.pid<<endl;
-                }
-
-
-                else{
-                    CPU_Process.CPU_Burst.pop_back();
-                    int IO_bst_size = CPU_Process.IO_Burst.size();
-
-                    pair<int, Process> pr = make_pair(CPU_Process.IO_Burst[IO_bst_size-1], CPU_Process);
-
-                    io_queue.push(pr);
+                }else{
+                    cpu_process.CPU_Burst.pop_back();
+                    io_queue.push({cpu_process.IO_Burst[cpu_process.IO_Burst.size()-1], cpu_process});
                     time++;
-                    idleCPU=true;
+                    cpu_idle=true;
                     continue;
                 }
-
-                // DeadC
-                bool flag10 = false;
-                if(flag10==true){
-                    int test = 0;
-                    Process x;
-                    x.pid = pid;
-                    x.firstOccurence = true;
-                    pid++;
-                    cout<<"x.pid = "<<x.pid<<endl;
-                }
-
-                idleCPU = true;
+                cpu_idle = true;
             }
         }
-        if(idleIO){
+        if(io_idle){
             if(!io_queue.empty()){
-                IO_Process = io_queue.top().second;
+                io_process = io_queue.top().second;
                 io_queue.pop();
-                idleIO = false;
+                io_idle = false;
             }
-        }
-        else{
-            IO_Process.IO_Burst[IO_Process.IO_Burst.size()-1]--;
-            if(IO_Process.IO_Burst[IO_Process.IO_Burst.size()-1] == 0){
-                int x=IO_Process.CPU_Burst.size();
-                if(IO_Process.CPU_Burst.size() == 0){
-                    //check pid of all process and if it is equal to IO_Process.pid then set its completion time
-                    for(int k=0; k<processSize; k++){
-                        if(process[k].pid == IO_Process.pid){
+        }else{
+            io_process.IO_Burst[io_process.IO_Burst.size()-1]--;
+            if(io_process.IO_Burst[io_process.IO_Burst.size()-1] == 0){
+                int x=io_process.CPU_Burst.size();
+                if(io_process.CPU_Burst.size() == 0){
+                    //check pid of all process and if it is equal to io_process.pid then set its completion time
+                    for(int k=0; k<numberOfProcess; k++){
+                        if(process[k].PID == io_process.PID){
                             process[k].completion_time = time+1;
                             break;
                         }
                     }
 
+                }else{
+                    io_process.IO_Burst.pop_back();
+                    cpu_queue.push({io_process.burst_time, io_process});
                 }
-                else{
-                    IO_Process.IO_Burst.pop_back();
-                    pair<int, Process> pr = make_pair(IO_Process.burst_time, IO_Process);
-                    cpu_queue.push(pr);
-                }
-                idleIO = true;
+                io_idle = true;
             }
         }
         time++;
-       if(cpu_queue.empty() && io_queue.empty() && idleCPU && idleIO) not_finished = false;
+       if(cpu_queue.empty() && io_queue.empty() && cpu_idle && io_idle) not_finished = false;
     }
-
     //print the completion time of each process and its pid
     int avg_wait_time=0, avg_turnaround_time=0, avg_response_time=0;
-
     for(auto p: process){
-        p.waiting_time = p.completion_time - p.ArrivalTime - p.cpu_burst_time;
+        p.waiting_time = p.completion_time - p.arrivalTime - p.cpu_burst_time;
         avg_wait_time += p.waiting_time;
-        p.turnaround_time = p.completion_time - p.ArrivalTime;
+        p.turnaround_time = p.completion_time - p.arrivalTime;
         avg_turnaround_time += p.turnaround_time;
         avg_response_time += p.response_time;
-        cout<<"Process "<<p.pid<<" completion time: "<<p.completion_time<<" arrival time: "<<p.ArrivalTime<<" waiting time: "<<p.waiting_time<<" turnaround time: "<<p.turnaround_time<<" response time: "<<p.response_time<<endl;
+        cout<<"Process "<<p.PID<<" completion time: "<<p.completion_time<<" arrival time: "<<p.arrivalTime<<" waiting time: "<<p.waiting_time<<" turnaround time: "<<p.turnaround_time<<" response time: "<<p.response_time<<endl;
     }
-    avg_wait_time /= processSize;
-    avg_turnaround_time /= processSize;
-    avg_response_time /= processSize;
+    avg_wait_time /= numberOfProcess;
+    avg_turnaround_time /= numberOfProcess;
+    avg_response_time /= numberOfProcess;
 
     cout<<"Average waiting time: "<<avg_wait_time<<endl;
     cout<<"Average turnaround time: "<<avg_turnaround_time<<endl;
