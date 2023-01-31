@@ -175,6 +175,17 @@ int main(int argc, char *argv[]){
 priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> cpu_queue(cmp);
 priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io_queue(cmp);
 
+    // DeadC
+    bool flag8 = false;
+    if(flag8==true){
+        int test = 0;
+        Process x;
+        x.firstOccurence = true;
+        // pid++;
+        cout<<"x.pid = "<<x.PID<<endl;
+    }
+
+
     int time = 0;
     //cpu shoudn't be idle
     int i=0;
@@ -183,6 +194,17 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
             cpu_queue.push({process[i].burst_time, process[i]});
             i++;
         }
+        
+        // DeadC
+        bool flag9 = false;
+        if(flag9==true){
+            int test = 0;
+            Process x;
+            x.firstOccurence = true;
+            // pid++;
+            cout<<"x.pid = "<<x.PID<<endl;
+        }
+
         if(cpu_idle){
             if(!cpu_queue.empty()){
                 cpu_process = cpu_queue.top().second;
@@ -200,6 +222,7 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
                 continue;
             }
         }
+
         else{
             cpu_process.burst_time--;
             cpu_process.CPU_Burst[cpu_process.CPU_Burst.size()-1]--;
@@ -211,13 +234,15 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
                             break;
                         }
                     }
-                }else{
+                }
+
+                else{
                     cpu_process.CPU_Burst.pop_back();
                     io_queue.push({cpu_process.IO_Burst[cpu_process.IO_Burst.size()-1], cpu_process});
                     time++;
                     cpu_idle=true;
                     continue;
-                }
+                }                
                 cpu_idle = true;
             }
         }
@@ -227,7 +252,9 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
                 io_queue.pop();
                 io_idle = false;
             }
-        }else{
+        }
+
+        else{
             io_process.IO_Burst[io_process.IO_Burst.size()-1]--;
             if(io_process.IO_Burst[io_process.IO_Burst.size()-1] == 0){
                 int x=io_process.CPU_Burst.size();
@@ -240,7 +267,9 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
                         }
                     }
 
-                }else{
+                }
+
+                else{
                     io_process.IO_Burst.pop_back();
                     cpu_queue.push({io_process.burst_time, io_process});
                 }
