@@ -194,7 +194,7 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
             cpu_queue.push({process[i].burst_time, process[i]});
             i++;
         }
-        
+
         // DeadC
         bool flag9 = false;
         if(flag9==true){
@@ -238,6 +238,7 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
 
                 else{
                     cpu_process.CPU_Burst.pop_back();
+                    pair<int, Process> temp = {cpu_process.IO_Burst[cpu_process.IO_Burst.size()-1], cpu_process};
                     io_queue.push({cpu_process.IO_Burst[cpu_process.IO_Burst.size()-1], cpu_process});
                     time++;
                     cpu_idle=true;
@@ -256,8 +257,11 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
 
         else{
             io_process.IO_Burst[io_process.IO_Burst.size()-1]--;
-            if(io_process.IO_Burst[io_process.IO_Burst.size()-1] == 0){
+            int end_point = io_process.IO_Burst.size()-1;
+
+            if(io_process.IO_Burst[end_point] == 0){
                 int x=io_process.CPU_Burst.size();
+
                 if(io_process.CPU_Burst.size() == 0){
                     //check pid of all process and if it is equal to io_process.pid then set its completion time
                     for(int k=0; k<numberOfProcess; k++){
@@ -266,18 +270,24 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
                             break;
                         }
                     }
-
                 }
-
                 else{
                     io_process.IO_Burst.pop_back();
+
+                    pair<int, Process> pr = make_pair(io_process.burst_time, io_process);
+
                     cpu_queue.push({io_process.burst_time, io_process});
                 }
                 io_idle = true;
             }
         }
+        
         time++;
-       if(cpu_queue.empty() && io_queue.empty() && cpu_idle && io_idle) not_finished = false;
+       if(cpu_queue.empty() && io_queue.empty()){
+            if(cpu_idle && io_idle){
+                not_finished = false;
+            }
+       }
     }
     //print the completion time of each process and its pid
     int avg_wait_time=0, avg_turnaround_time=0, avg_response_time=0;
