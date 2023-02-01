@@ -40,29 +40,11 @@ int main(int argc, char *argv[]){
         cout<<"File not found"<<endl;
         return 0;
     }
-    // DeadC
-    bool flag1 = false;
-    if(flag1==true){
-        int test = 0;
-        Process x;
-        x.firstOccurence = true;
-        // pid++;
-        cout<<"x.pid = "<<x.PID<<endl;
-    }
+
+
     //vector to store the process
     vector<Process> process;
     //now read the file line by line upto the end of file using while loop
-
-    // DeadC
-    bool flag2 = false;
-    if(flag2==true){
-        int test = 0;
-        Process x;
-        x.firstOccurence = true;
-        // pid++;
-        cout<<"x.pid = "<<x.PID<<endl;
-    }
-
     int pid=1;
 
 
@@ -73,26 +55,17 @@ int main(int argc, char *argv[]){
         p.firstOccurence = true;
         pid++;
 
-        // DeadC
-        bool flag3 = false;
-        if(flag3==true){
-            int test = 0;
-            Process x;
-            x.firstOccurence = true;
-            // pid++;
-            cout<<"x.pid = "<<x.PID<<endl;
-        }
-
-        // first line of each process contains arrival time and consecutive cpu burst and io burst
-        //first element is arrival time
-
+        //first element is arrival time and then cpu burst and io burst
         int arrival_time_val;
+
+        // read the first input from the file
         fscanf(inputFile, "%d", &arrival_time_val);
 
         p.arrivalTime = arrival_time_val;
         //now read the cpu burst and io burst
         int cpu_burst, io_burst;
         //end of line is indicated by -1
+
         while(fscanf(inputFile, "%d", &cpu_burst) && cpu_burst != -1){
             if(cpu_burst!=-1){
                 p.CPU_Burst.push_back(cpu_burst);
@@ -117,16 +90,6 @@ int main(int argc, char *argv[]){
         p.burst_time = total_burst_time;
         p.cpu_burst_time = p.burst_time;
 
-        // DeadC
-        bool flag4 = false;
-        if(flag4==true){
-            int test = 0;
-            Process x;
-            x.firstOccurence = true;
-            // pid++;
-            cout<<"x.pid = "<<x.PID<<endl;
-        }
-
         //push the process in the vector
         process.push_back(p);
     }
@@ -136,32 +99,12 @@ int main(int argc, char *argv[]){
         return a.arrivalTime < b.arrivalTime;
     });
 
-    // DeadC
-    bool flag5 = false;
-    if(flag5==true){
-        int test = 0;
-        Process x;
-        x.firstOccurence = true;
-        // pid++;
-        cout<<"x.pid = "<<x.PID<<endl;
-    }
-
     bool cpu_idle = true;
     bool io_idle = true;
     bool not_finished = true;
 
     int numberOfProcess = process.size();
     Process cpu_process, io_process;
-    
-    // DeadC
-    bool flag6 = false;
-    if(flag6==true){
-        int test = 0;
-        Process x;
-        x.firstOccurence = true;
-        // pid++;
-        cout<<"x.pid = "<<x.PID<<endl;
-    }
 
     // priority queue of pair of int and process
     // first element of pair is the burst time and second element is the process
@@ -173,48 +116,16 @@ int main(int argc, char *argv[]){
         return a.first > b.first;
     };
 
-    // DeadC
-    bool flag7 = false;
-    if(flag7==true){
-        int test = 0;
-        Process x;
-        x.firstOccurence = true;
-        // pid++;
-        cout<<"x.pid = "<<x.PID<<endl;
-    }
-    
-
 priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> cpu_queue(cmp);
 priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io_queue(cmp);
 
-    // DeadC
-    bool flag8 = false;
-    if(flag8==true){
-        int test = 0;
-        Process x;
-        x.firstOccurence = true;
-        // pid++;
-        cout<<"x.pid = "<<x.PID<<endl;
-    }
-
-
     int time = 0;
-    //cpu shoudn't be idle
+    //cpu shouldn't be idle
     int i=0;
     while(not_finished){
         while(i<numberOfProcess && process[i].arrivalTime <= time){
             cpu_queue.push({process[i].burst_time, process[i]});
             i++;
-        }
-
-        // DeadC
-        bool flag9 = false;
-        if(flag9==true){
-            int test = 0;
-            Process x;
-            x.firstOccurence = true;
-            // pid++;
-            cout<<"x.pid = "<<x.PID<<endl;
         }
 
         if(cpu_idle){
@@ -311,6 +222,7 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
     float avg_turnaround_time;
     float avg_response_time;
 
+    // calculate average wait time, turnaround time and response time for each process in the vector process list 
     for(auto p: process){
         p.waiting_time = getWaitingTime(p.completion_time, p.arrivalTime, p.cpu_burst_time);
         // p.waiting_time = p.completion_time - p.arrivalTime - p.cpu_burst_time;
@@ -331,7 +243,5 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
     avg_response_time = calcAvg(sum_response_time, numberOfProcess);
     avg_wait_time = calcAvg(sum_wait_time, numberOfProcess);
 
-    cout<<"Average waiting time: "<<avg_wait_time<<endl;
-    cout<<"Average turnaround time: "<<avg_turnaround_time<<endl;
-    cout<<"Average response time: "<<avg_response_time<<endl;
+    cout<<"Average waiting time: "<<avg_wait_time<<endl<<"Average turnaround time: "<<avg_turnaround_time<<endl<<"Average response time: "<<avg_response_time<<endl;
 }
