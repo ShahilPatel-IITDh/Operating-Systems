@@ -155,6 +155,7 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
                     for(int k=0; k<numberOfProcess; k++){
                         if(process[k].PID == cpu_process.PID){
                             process[k].completion_time = time+1;
+                            
                             break;
                         }
                     }
@@ -243,5 +244,5 @@ priority_queue<pair<int, Process>, vector<pair<int, Process>>, decltype(cmp)> io
     avg_response_time = calcAvg(sum_response_time, numberOfProcess);
     avg_wait_time = calcAvg(sum_wait_time, numberOfProcess);
 
-    cout<<"Average waiting time: "<<avg_wait_time<<endl<<"Average turnaround time: "<<avg_turnaround_time<<endl<<"Average response time: "<<avg_response_time<<endl;
+    cout<<"Average waiting time: "<<avg_wait_time<<endl<<"Average turnaround time: "<<avg_turnaround_time<<endl<<"Average response time: "<<avg_response_time<<endl<<" Throughput: "<<numberOfProcess/time<<endl;
 }
