@@ -194,7 +194,7 @@ void readFile(string fileLine){
     }
     cout << "Response Time = " << runTime / sizeOfProcess << " Wait Time = " << avgWaitTime / sizeOfProcess << " Burst Time = " << avgBurstTime / sizeOfProcess << " Turn Around Time = " << avgTurnaroundTime / sizeOfProcess << " Penalty Ratio = " << penaltyRatio / sizeOfProcess << endl;
 
-    cout << "System throughput = " << sizeOfProcess * 1.0 / (time1 - 1) << endl;
+    // cout << "System throughput = " << sizeOfProcess * 1.0 / (time1 - 1) << endl;
 }
 
 int main(int argc, char *argv[]){
