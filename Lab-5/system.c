@@ -630,7 +630,7 @@ int sched_proc(struct proc *p,
 	if (quantum < 1 && quantum != -1)
 		return(EINVAL);
 
-printf("Quantum Alloted: %d, Quantum Used: %d\n", p->p_quantum_size_ms, p->p_quantum_size_ms - cpu_time_2_ms(p->p_cpu_time_left));
+printf("(200010039, 200010041) Quantum Alloted is: %d\n, Quantum Used is: %d\n", p->p_quantum_size_ms, p->p_quantum_size_ms - cpu_time_2_ms(p->p_cpu_time_left));
 
 #ifdef CONFIG_SMP
 	if ((cpu < 0 && cpu != -1) || (cpu > 0 && (unsigned) cpu >= ncpus))
