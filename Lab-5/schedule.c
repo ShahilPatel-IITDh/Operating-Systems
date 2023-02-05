@@ -100,7 +100,8 @@ int do_noquantum(message *m_ptr)
 
 	rmp = &schedproc[proc_nr_n];
 	if (rmp->priority < MIN_USER_Q) {
-		rmp->priority += 1; /* lower priority */
+		// Here we decrement rmp->priority to implement FIFO by incrementing the priority of the newly arrived process
+		rmp->priority -= 1; /* higher priority */
 	}
 
 	if ((rv = schedule_process_local(rmp)) != OK) {
@@ -324,7 +325,13 @@ static int schedule_process(struct schedproc * rmp, unsigned flags)
 		printf("PM: An error occurred when trying to schedule %d: %d\n",
 		rmp->endpoint, err);
 	}
-
+	// if parent process' current priority is greater than 7 (User_Q) (i.e. rmp is a normal process) then print the swapped in line for it.
+	if(rmp->priority >= USER_Q){
+        // rmp->endpoint = parent process' endpoint id
+		// _ENDPOINT_P will take rmp->endpoint as its argument and will return a unique combination of the process PID and generation ID of the process.
+		printf("(200010039, 200010041)Minix: PID %d swapped in\n", _ENDPOINT_P(rmp->endpoint));
+	}
+	
 	return err;
 }
 
@@ -357,7 +364,6 @@ static void balance_queues(minix_timer_t *tp)
 	for (proc_nr=0, rmp=schedproc; proc_nr < NR_PROCS; proc_nr++, rmp++) {
 		if (rmp->flags & IN_USE) {
 			if (rmp->priority > rmp->max_priority) {
-				rmp->priority -= 1; /* increase priority */
 				schedule_process_local(rmp);
 			}
 		}
