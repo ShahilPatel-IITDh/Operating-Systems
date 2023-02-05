@@ -1,7 +1,7 @@
 #!/bin/sh
-./syscall.sh &
+./pipe.sh &
 ./pipe.sh &
 ./syscall.sh &
 ./pipe.sh &
-./syscall.sh &
+./pipe.sh &
 wait

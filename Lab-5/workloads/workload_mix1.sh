@@ -1,8 +1,8 @@
 #!/bin/sh
 
-./arithoh.sh &
 ./fstime.sh &
-./syscall.sh &
 ./fstime.sh &
-./arithoh.sh &
+./fstime.sh &
+./fstime.sh &
+./fstime.sh &
 wait

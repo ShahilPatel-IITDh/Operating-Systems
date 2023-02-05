@@ -1,6 +1,6 @@
-./syscall.sh &
 ./spawn.sh &
-./syscall.sh &
 ./spawn.sh &
+./arithoh.sh &
+./arithoh.sh &
 ./spawn.sh &
 wait
