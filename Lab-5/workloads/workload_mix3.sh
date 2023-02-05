@@ -1,4 +1,5 @@
 #!/bin/sh
+
 ./pipe.sh &
 ./pipe.sh &
 ./syscall.sh &

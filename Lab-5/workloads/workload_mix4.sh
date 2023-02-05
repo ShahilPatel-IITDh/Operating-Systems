@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ./spawn.sh &
 ./spawn.sh &
 ./arithoh.sh &
