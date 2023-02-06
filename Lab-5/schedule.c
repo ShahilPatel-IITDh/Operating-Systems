@@ -100,7 +100,7 @@ int do_noquantum(message *m_ptr)
 
 	rmp = &schedproc[proc_nr_n];
 	if (rmp->priority < MIN_USER_Q) {
-		// Here we decrement rmp->priority to implement FIFO by incrementing the priority of the newly arrived process
+		// Here we decrement rmp->priority to implement FIFO by incrementing the priority of the currently executing process
 		rmp->priority -= 1; /* higher priority */
 	}
 
