@@ -10,12 +10,6 @@ class Pixel{
         int green;
         int blue;
 
-        // Pixel(int red, int green, int blue){
-        //     this->red = red;
-        //     this->green = green;
-        //     this->blue = blue;
-        // }
-
         void setRed(int red){
             this->red = red;
         }
@@ -41,6 +35,10 @@ class Pixel{
         }
 };
 
+int getNewColour(int colour, int blur){
+    int newColour = colour * (0.5/blur);
+    return newColour;
+}
 
 // Function to converts an image to Grayscale by iterating over pixels and then rows and updating pixel values
 void RGBtoGrayScale(int width, int height, vector<vector<Pixel>> &matrix){
@@ -50,9 +48,62 @@ void RGBtoGrayScale(int width, int height, vector<vector<Pixel>> &matrix){
             int colourRed = matrix[i][i].getRed();
             int colourGreen = matrix[i][j].getGreen();
             int colourBlue = matrix[i][j].getBlue();
-            matrix[i][j].setRed((colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587));
-            matrix[i][j].setGreen((colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587));
-            matrix[i][j].setBlue((colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587));
+
+            // weighted average of red, green and blue is calculated and then assigned to all three values
+            // this is done to convert the image to grayscale
+            // wighted average = (0.299 * red) + (0.587 * green) + (0.114 * blue)
+            int newRed = (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
+            int newGreen = (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
+            int newBlue = (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
+
+            matrix[i][j].setRed(newRed);
+            matrix[i][j].setGreen(newGreen);
+            matrix[i][j].setBlue(newBlue);
+        }
+    }
+}
+
+void HorizontalBlur(int width, int height, vector<vector<Pixel>> &matrix){
+    
+    int blurAmount = 80;
+    for (int i = 0; i < height; i++){
+        for (int j = 0; j < width; j++){
+
+            int colourRed = matrix[i][j].getRed()/2;
+            int colourGreen = matrix[i][j].getGreen()/2;
+            int colourBlue = matrix[i][j].getBlue()/2;
+
+            if((width-j)<blurAmount){
+
+                int newBlurAmount = width-j;
+
+                for(int k = j+1; k < width; k++){
+                    colourRed += getNewColour(matrix[i][k].getRed(), newBlurAmount);
+                    // colourRed += (matrix[i][k].getRed() * (0.5/newBlurAmount));
+                    colourGreen += getNewColour(matrix[i][k].getGreen(), newBlurAmount);
+                    // colourGreen += (matrix[i][k].getGreen() * (0.5/newBlurAmount));
+                    colourBlue += getNewColour(matrix[i][k].getBlue(), newBlurAmount);
+                    // colourBlue += (matrix[i][k].getBlue() * (0.5/newBlurAmount));   
+                }
+
+                matrix[i][j].setRed(colourRed);
+                matrix[i][j].setBlue(colourBlue);
+                matrix[i][j].setGreen(colourGreen);
+                continue;
+            }
+
+            for (int k = 1; k < blurAmount; k++){
+                colourRed += getNewColour(matrix[i][j+k].getRed(), blurAmount);
+                // colourRed += matrix[i][j+k].getRed() * (0.5/blurAmount);
+                colourGreen += getNewColour(matrix[i][j+k].getGreen(), blurAmount);
+                // colourGreen += matrix[i][j+k].getGreen() * (0.5/blurAmount);
+                colourBlue += getNewColour(matrix[i][j+k].getBlue(), blurAmount);
+                // colourBlue += matrix[i][j+k].getBlue() * (0.5/blurAmount);
+            }
+
+            matrix[i][j].setRed(colourRed);
+            matrix[i][j].setBlue(colourBlue);
+            matrix[i][j].setGreen(colourGreen);
         }
     }
 }
@@ -67,7 +118,7 @@ int main(int argc, char* argv[]){
     int width;
     int height;
     int maxASCII;
-    char ppmVersion[10];
+    char ppmVersion[3];
     FILE* inputImage = fopen(argv[1], "r");
 
     if (inputImage == NULL) {
@@ -79,10 +130,6 @@ int main(int argc, char* argv[]){
 
     // Read from the file the PPM Version, Width, Height and Maximum Ascii value allowed.
     fscanf(inputImage, "%s%d%d%d", ppmVersion, &width, &height, &maxASCII);
-
-    // fscanf(inputImage, "%s", ppmVersion);
-    // fscanf(inputImage, "%d %d", &width, &height);
-    // fscanf(inputImage, "%d", &maxASCII);
 
     // make a vector to store the pixels 
     // each pixel will be of type 'pixel'
@@ -104,7 +151,12 @@ int main(int argc, char* argv[]){
     fclose(inputImage);
 
     auto beginStamp = chrono::high_resolution_clock::now(); // Starting the clock
+
+    // call the function to convert the image to grayscale (T1 function)
     RGBtoGrayScale(width, height, matrix);
+    // call the function to apply the horizontal blur (T2 function)
+    HorizontalBlur(width, height, matrix);
+
     auto endStamp = chrono::high_resolution_clock::now(); //Stopping the clock
     auto duration = chrono::duration_cast<chrono::microseconds>(endStamp - beginStamp);//Calculating the time taken by T1 and T2
     cout<<"Time Taken: "<<duration.count()<<" microseconds"<<endl;
@@ -113,12 +165,13 @@ int main(int argc, char* argv[]){
     fprintf(outputImage, "%s\n%d %d\n%d\n", ppmVersion, width, height, maxASCII);
     for(int i=height-1; i>=0; i--){
         for(int j=0; j<width; j++){
-            fprintf(outputImage, "%d", matrix[i][j].getRed());
-            fprintf(outputImage, "%d", matrix[i][j].getGreen());
-            fprintf(outputImage, "%d", matrix[i][j].getBlue());
+            fprintf(outputImage, "%d ", matrix[i][j].getRed());
+            fprintf(outputImage, "%d ", matrix[i][j].getGreen());
+            fprintf(outputImage, "%d ", matrix[i][j].getBlue());
         }
         fprintf(outputImage, "\n");
     }
+
     fclose(outputImage);
     return 0;
 }
