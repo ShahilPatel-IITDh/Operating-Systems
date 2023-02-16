@@ -65,7 +65,7 @@ void RGBtoGrayScale(int width, int height, vector<vector<Pixel>> &matrix){
 
 void HorizontalBlur(int width, int height, vector<vector<Pixel>> &matrix){
     
-    int blurAmount = 80;
+    int blurAmount = 30;
     for (int i = 0; i < height; i++){
         for (int j = 0; j < width; j++){
 
