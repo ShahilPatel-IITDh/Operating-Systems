@@ -131,6 +131,17 @@ void HorizontalBlur(int width, int height, vector<vector<Pixel>> &matrix){
     }
 }
 
+void printImage(int width, int height, vector<vector<Pixel>> &matrix, FILE* outputImage){
+    for(int i=height-1; i>=0; i--){
+        for(int j=0; j<width; j++){
+            fprintf(outputImage, "%d ", matrix[i][j].getRed());
+            fprintf(outputImage, "%d ", matrix[i][j].getGreen());
+            fprintf(outputImage, "%d ", matrix[i][j].getBlue());
+        }
+        fprintf(outputImage, "\n");
+    }
+}
+
 int main(int argc, char* argv[]){
 
     if(argc != 3){
@@ -184,7 +195,7 @@ int main(int argc, char* argv[]){
 
     // call the function to convert the image to grayscale (T1 function)
     // RGBtoGrayScale(width, height, matrix);
-    
+
     // call the function to apply the horizontal blur (T2 function)
     // HorizontalBlur(width, height, matrix);
 
@@ -194,14 +205,9 @@ int main(int argc, char* argv[]){
 
     // write the pixels to the output file
     fprintf(outputImage, "%s\n%d %d\n%d\n", ppmVersion, width, height, maxASCII);
-    for(int i=height-1; i>=0; i--){
-        for(int j=0; j<width; j++){
-            fprintf(outputImage, "%d ", matrix[i][j].getRed());
-            fprintf(outputImage, "%d ", matrix[i][j].getGreen());
-            fprintf(outputImage, "%d ", matrix[i][j].getBlue());
-        }
-        fprintf(outputImage, "\n");
-    }
+
+    // call the function to print the image to the output file
+    printImage(width, height, matrix, outputImage);
 
     fclose(outputImage);
     return 0;
