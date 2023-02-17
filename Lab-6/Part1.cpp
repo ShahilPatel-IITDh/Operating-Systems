@@ -40,29 +40,6 @@ int getNewColour(int colour, int blur){
     return newColour;
 }
 
-// Function to converts an image to Grayscale by iterating over pixels and then rows and updating pixel values
-void RGBtoGrayScale(int width, int height, vector<vector<Pixel>> &matrix){
-
-    for (int i = 0; i < height; i++){
-        for (int j = 0; j < width; j++){
-            int colourRed = matrix[i][i].getRed();
-            int colourGreen = matrix[i][j].getGreen();
-            int colourBlue = matrix[i][j].getBlue();
-
-            // weighted average of red, green and blue is calculated and then assigned to all three values
-            // this is done to convert the image to grayscale
-            // wighted average = (0.299 * red) + (0.587 * green) + (0.114 * blue)
-            int newRed = (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
-            int newGreen = (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
-            int newBlue = (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
-
-            matrix[i][j].setRed(newRed);
-            matrix[i][j].setGreen(newGreen);
-            matrix[i][j].setBlue(newBlue);
-        }
-    }
-}
-
 void HorizontalBlur(int width, int height, vector<vector<Pixel>> &matrix){
     
     int blurAmount = 30;
@@ -104,6 +81,29 @@ void HorizontalBlur(int width, int height, vector<vector<Pixel>> &matrix){
             matrix[i][j].setRed(colourRed);
             matrix[i][j].setBlue(colourBlue);
             matrix[i][j].setGreen(colourGreen);
+        }
+    }
+}
+
+// Function to converts an image to Grayscale by iterating over pixels and then rows and updating pixel values
+void RGBtoGrayScale(int width, int height, vector<vector<Pixel>> &matrix){
+
+    for (int i = 0; i < height; i++){
+        for (int j = 0; j < width; j++){
+            int colourRed = matrix[i][i].getRed();
+            int colourGreen = matrix[i][j].getGreen();
+            int colourBlue = matrix[i][j].getBlue();
+
+            // weighted average of red, green and blue is calculated and then assigned to all three values
+            // this is done to convert the image to grayscale
+            // wighted average = (0.299 * red) + (0.587 * green) + (0.114 * blue)
+            int newRed = (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
+            int newGreen = (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
+            int newBlue = (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
+
+            matrix[i][j].setRed(newRed);
+            matrix[i][j].setGreen(newGreen);
+            matrix[i][j].setBlue(newBlue);
         }
     }
 }
