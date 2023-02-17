@@ -6,7 +6,7 @@
 using namespace std;
 
 //Defining global Locks
-atomic_flag get_lock = ATOMIC_FLAG_INIT; //get_lock set to false initially
+atomic_flag get_lock = ATOMIC_FLAG_INIT; // get_lock set to false initially
 
 //Creating struct structure for reading pixels easily in ppm3
 
