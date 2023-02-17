@@ -6,6 +6,7 @@
 
 using namespace std;
 
+atomic_flag threadLock = ATOMIC_FLAG_INIT;
 class Pixel{
     public: 
         int red;
@@ -37,7 +38,6 @@ class Pixel{
         }
 };
 
-atomic_flag threadLock = ATOMIC_FLAG_INIT;
 
 int getNewColour(int colour, int blur){
     int newColour = colour * (0.5/blur);
@@ -50,7 +50,7 @@ void RGBtoGrayScale(int width, int height, vector<vector<Pixel>> &matrix){
     for (int i = 0; i < height; i++){        
         for (int j = 0; j < width; j++){
 
-            // Lock for the current row, so that no other thread can access it
+            // Lock for the current pixel, so that no other thread can access it
             // We use a while loop because the atomic_flag_test_and_set function returns true if the lock is already set. This is a spin lock
             while (atomic_flag_test_and_set(&threadLock));
             
@@ -69,7 +69,7 @@ void RGBtoGrayScale(int width, int height, vector<vector<Pixel>> &matrix){
             matrix[i][j].setGreen(newGreen);
             matrix[i][j].setBlue(newBlue);
 
-            // Unlock the current row
+            // Unlock the current pixel
             atomic_flag_clear(&threadLock);
         }
     }
@@ -108,7 +108,7 @@ void HorizontalBlur(int width, int height, vector<vector<Pixel>> &matrix){
                 matrix[i][j].setGreen(colourGreen);
 
                 // Unlock the thread for the current pixel
-                // atomic_flag_clear(&threadLock);
+                atomic_flag_clear(&threadLock);
                 continue;
             }
 
