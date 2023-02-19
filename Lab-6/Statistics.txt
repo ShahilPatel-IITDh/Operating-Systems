@@ -1,0 +1,37 @@
+For input: Chambers
+
+size: 10.0 MB
+
+Part1: 1127559 microseconds
+Part2-1-a: 1280655 microseconds
+Part2-1-b: 1113082 microseconds
+Part2-2:    Time: 806090 microseconds
+            Time: 1635099 microseconds
+            Time: 2094010 microseconds
+            Time: 2585997 microseconds
+Part2-3: 2415869 microseconds
+
+
+For input: eagle.ppm
+
+size: 177.0 kB 
+Part-1: 17932 microseconds
+Part2-1-a: 28024 microseconds
+Part-2-1-b: 19834 microseconds
+Part-2-2:   Time: 15683 microseconds
+            Time: 30625 microseconds
+            Time: 35191 microseconds
+            Time: 45130 microseconds
+Part-2-3:   Time: 45369 microseconds
+
+For input: smallBackground.ppm
+size:   239 bytes
+
+Part-1:  19 microseconds
+Part-2-1-a:   231 microseconds
+Part-2-1-b:   414 microseconds
+Part-2-2:   Time: 1748 microseconds
+            Time: 2371 microseconds
+            Time: 4363 microseconds
+            Time: 6142 microseconds
+Part-2-3:   824 microseconds 
