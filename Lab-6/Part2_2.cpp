@@ -120,6 +120,8 @@ void HorizontalBlur(key_t key, int h, int w, int pid){
     int blurAmount = 50;
 
     for (int p = 0; p < h; p++){
+        
+        // sem_wait(s)
         sem_wait(s);
         for (int q = 0; q < w; q++){
 
@@ -140,12 +142,15 @@ void HorizontalBlur(key_t key, int h, int w, int pid){
 
             if((w-q) < blurAmount){
 
+                // newBlurAmount => (w-q), where w = width, q = column
                 int newBlurAmount = w-q;
 
                 for(int u = q+1; u < w; u++){
                     
+                    // idx => (p*w)+u, where p = row, q = column, u = blurAmount, w = width
                     int idx = (p*w)+u;
 
+                    // Getting the red, green and blue values of the pixel
                     int redArg = values[idx].red;
                     redColour += getColour(redArg, newBlurAmount);
 
@@ -164,8 +169,10 @@ void HorizontalBlur(key_t key, int h, int w, int pid){
 
             for (int i = 1; i < blurAmount; i++){
                 
+                // idx => (p*w)+(q+i), where p = row, q = column, i = blurAmount, w = width
                 int idx = (p*w)+(q+i);
                 
+                // Getting the red, green and blue values of the pixel
                 int redArg = values[idx].red;
                 redColour += getColour(redArg, blurAmount);
 
@@ -176,6 +183,7 @@ void HorizontalBlur(key_t key, int h, int w, int pid){
                 blueColour += getColour(blueArg, blurAmount);
             }
 
+            // 
             matrixValues[p][q].red = redColour;
             matrixValues[p][q].blue = blueColour;
             matrixValues[p][q].green = greenColour;            
@@ -194,28 +202,31 @@ int main(int argc, char *argv[]){
 
     int width;
     int height;
-    int maxAscii;
+    int maxASCII;
 
-    char PPM_VERSION[10];
+    char PPM_VERSION[3];
     FILE *input_image = fopen(argv[1], "r");
 
-    fscanf(input_image, "%s%d%d%d", PPM_VERSION, &width, &height, &maxAscii); // reading from file the PPM Version, Width, Height and Maximum Ascii value allowed.
+    fscanf(input_image, "%s%d%d%d", PPM_VERSION, &width, &height, &maxASCII); // reading from file the PPM Version, Width, Height and Maximum Ascii value allowed.
     
-    struct Pixel *values;
 
+    // key_t key (0x1234) is the key that will be used to access the shared memory.
     key_t key = 0x1234;
     int shmid = shmget(key, sizeof(struct Pixel) * (height) * width, 0666 | IPC_CREAT);
 
+    struct Pixel *values;
     values = (struct Pixel *)shmat(shmid, NULL, 0);
 
+    // Reading the RGB values from the file and storing them in the struct.
     struct Pixel temp;
     
-    //vector<vector<Pixel>> values(h, vector<Pixel>(w)); //Vector for reading and storing pixels as a matrix. 
     int red, green, blue;
 
     for (int i = height-1; i >= 0; i--){
-        for (int j=0; j<width; j++){   
-            //Storing RGB pixel values into above created matrix.
+        for (int j=0; j<width; j++){  
+
+            // Reading the RGB values from the file and storing them in the struct.
+            // The values are stored in the struct in the reverse order as the image is read from the bottom to the top.
             fscanf(input_image, "%d%d%d", &red, &green, &blue);
             temp.red = red;
             temp.green = green;
@@ -226,40 +237,58 @@ int main(int argc, char *argv[]){
 
     fclose(input_image);
 
+    // Starting the clock
     auto beginStamp = chrono::high_resolution_clock::now(); // Starting the clock
 
+    // Creating a named semaphore, which can be used by multiple processes.
     sem_t *s = sem_open(SEM_NAME, O_CREAT | O_EXCL, SEM_PERMS, INITIAL_VALUE); //named semaphore
 
+    // Forking the process into two threads.
+    // T1 and T2 are the two threads.
+    // T1 does a RGB to Gray Scale conversion.
     RGBtoGrayScale(key, height, width, fork());
+
+    // T2 does a horizontal blur.
+    // The horizontal blur makes the image as if it is in motion.
     HorizontalBlur(key, height, width, fork());
 
     wait(NULL);
     wait(NULL);
 
+    // Stopping the clock
     auto endStamp = chrono::high_resolution_clock::now(); //Stopping the clock
 
     // Calculating the time taken by T1 and T2.
     auto duration = chrono::duration_cast<chrono::microseconds>(endStamp - beginStamp);
 
+    // Printing the time taken by T1 and T2. duration.count() gives the time in microseconds.
     cout << "Time: " << duration.count() << " microseconds"<< endl;
 
     FILE *output_image = fopen(argv[2], "w");
-    
-    fprintf(output_image, "%s\n%d %d\n%d\n", PPM_VERSION, width, height, maxAscii); // Printing to the file the PPM Version, Width, Height and Maximum Ascii value allowed.
 
+    // Printing to the file the PPM Version, Width, Height and Maximum Ascii value allowed.
+    fprintf(output_image, "%s\n%d %d\n%d\n", PPM_VERSION, width, height, maxASCII); // Printing to the file the PPM Version, Width, Height and Maximum Ascii value allowed.
+
+
+    // Printing RGB pixel values from above updated image matrix.
     for (int i=height-1; i>=0; i--){
         for (int j=0; j<width; j++){  
              // Printing RGB pixel values from above updated image matrix.
             temp = values[(i * width) + j];
-
+            
+            // Printing the RGB values to the file.
             fprintf(output_image, "%d ", temp.red);
             fprintf(output_image, "%d ", temp.green);
             fprintf(output_image, "%d ", temp.blue);
         }
+        // Printing a new line after every row.
         fprintf(output_image, "\n");
     }
-
+    
+    // Closing the file.
     fclose(output_image);
+
+    // Detaching the shared memory.
     shmdt(values);
     shmctl(shmid,IPC_RMID,NULL);
     return 0;
