@@ -1,231 +1,265 @@
 #include <bits/stdc++.h>
-#include <cmath>
-#include <vector>
 #include <chrono>
+#include <vector>
 #include <thread>
-#include <semaphore.h>
-#include <unistd.h> //for fork()
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/shm.h>
+#include <semaphore.h>
+#include <unistd.h> //for fork()
 #include <fcntl.h>
+
+using namespace std;
 
 #define SEM_NAME "/s"
 #define SEM_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
 #define INITIAL_VALUE 1
 
-using namespace std;
+//Creating struct structure for reading pixels easily in ppm3
 
-class Pixel{
-    public: 
-        int red;
-        int green;
-        int blue;
 
-        void setRed(int red){
-            this->red = red;
-        }
-
-        int getRed(){
-            return this->red;
-        }
-
-        void setGreen(int green){
-            this->green = green;
-        }
-
-        int getGreen(){
-            return this->green;
-        }
-
-        void setBlue(int blue){
-            this->blue = blue;
-        }
-
-        int getBlue(){
-            return this->blue;
-        }
+// Class is given segmentation fault
+struct Pixel{
+    int red;
+    int green;
+    int blue;
 };
 
-int getNewColour(int colour, int blur){
-    int newColour = colour * (0.5/blur);
-    return newColour;
-}
-
-void HorizontalBlur(key_t key, int width, int height, vector<vector<Pixel>> &matrix, int pid){
+//This function converts an image to Grayscale by iterating over pixels and then rows and updating pixel values
+void RGBtoGrayScale(key_t key, int height, int width, int pid){
     
-	if (pid > 0)
-        	return;
-
-    int shmid = shmget(key, sizeof(class Pixel) * height * width, 0666 | IPC_CREAT);
-    Pixel *values;
-    values = (class Pixel *)shmat(shmid, NULL, 0);
-
-    class Pixel t;
-
-    vector<vector<Pixel>> tvalues(height, vector<Pixel>(width));
-    
-    sem_t *s = sem_open(SEM_NAME, O_RDWR);
-
-    int blurAmount = 30;
-    for (int i = 0; i < height; i++){
-        sem_wait(s);
-        for (int j = 0; j < width; j++){
-
-            int colourRed = matrix[i][j].getRed()/2;
-            int colourGreen = matrix[i][j].getGreen()/2;
-            int colourBlue = matrix[i][j].getBlue()/2;
-
-            if((width-j)<blurAmount){
-
-                int newBlurAmount = width-j;
-
-                for(int k = j+1; k < width; k++){
-                    colourRed += getNewColour(matrix[i][k].getRed(), newBlurAmount);
-                    // colourRed += (matrix[i][k].getRed() * (0.5/newBlurAmount));
-                    colourGreen += getNewColour(matrix[i][k].getGreen(), newBlurAmount);
-                    // colourGreen += (matrix[i][k].getGreen() * (0.5/newBlurAmount));
-                    colourBlue += getNewColour(matrix[i][k].getBlue(), newBlurAmount);
-                    // colourBlue += (matrix[i][k].getBlue() * (0.5/newBlurAmount));   
-                }
-
-                matrix[i][j].setRed(colourRed);
-                matrix[i][j].setBlue(colourBlue);
-                matrix[i][j].setGreen(colourGreen);
-                continue;
-            }
-
-            for (int k = 1; k < blurAmount; k++){
-                colourRed += getNewColour(matrix[i][j+k].getRed(), blurAmount);
-                // colourRed += matrix[i][j+k].getRed() * (0.5/blurAmount);
-                colourGreen += getNewColour(matrix[i][j+k].getGreen(), blurAmount);
-                // colourGreen += matrix[i][j+k].getGreen() * (0.5/blurAmount);
-                colourBlue += getNewColour(matrix[i][j+k].getBlue(), blurAmount);
-                // colourBlue += matrix[i][j+k].getBlue() * (0.5/blurAmount);
-            }
-
-            matrix[i][j].setRed(colourRed);
-            matrix[i][j].setBlue(colourBlue);
-            matrix[i][j].setGreen(colourGreen);
-        }
-        sem_post(s);
+    if (pid > 0){
+        return;
     }
-}
 
-// Function to converts an image to Grayscale by iterating over pixels and then rows and updating pixel values
-void RGBtoGrayScale(key_t key, int width, int height, vector<vector<Pixel>> &matrix, int pid){
-	
-	if (pid > 0)
-                return;
+    if(pid == -1){
+        cout<<"Error in fork"<<endl;
+    }
 
-    int shmid = shmget(key, sizeof(class Pixel) * height * width, 0666 | IPC_CREAT);
-    Pixel *values;
-    values = (class Pixel *)shmat(shmid, NULL, 0);
+    int shmid = shmget(key, sizeof(struct Pixel) * height * width, 0666 | IPC_CREAT);
+    
+    if(shmid == -1){
+        cout<<"Error in shmget"<<endl;
+    }
+
+    struct Pixel *values;
+
+    values = (struct Pixel *)shmat(shmid, NULL, 0);
+
+    if(values == (void *)-1){
+        cout<<"Error in shmat"<<endl;
+    }
 
     //access named semaphore
     sem_t *s = sem_open(SEM_NAME, O_RDWR);
 
-    for (int i = 0; i < height; i++){
+    if(s == SEM_FAILED){
+        cout<<"Error in sem_open"<<endl;
+    }
+        
+    for (int p = 0; p < height; p++){
         sem_wait(s);
-        for (int j = 0; j < width; j++){
-            int colourRed = matrix[i][i].getRed();
-            int colourGreen = matrix[i][j].getGreen();
-            int colourBlue = matrix[i][j].getBlue();
 
-            // weighted average of red, green and blue is calculated and then assigned to all three values
-            // this is done to convert the image to grayscale
-            // wighted average = (0.299 * red) + (0.587 * green) + (0.114 * blue)
-            int newRed = (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
-            int newGreen = (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
-            int newBlue = (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
+        for (int q = 0; q < width; q++){
+            struct Pixel temp;
 
-            matrix[i][j].setRed(newRed);
-            matrix[i][j].setGreen(newGreen);
-            matrix[i][j].setBlue(newBlue);
+            temp = values[p * width + q];
+
+            int redColour = temp.red;
+            int greenColour = temp.green;
+            int blueColour = temp.blue;
+
+            int lumious = (blueColour * 0.114) + (redColour * 0.299) + (greenColour * 0.587);
+
+            temp.red = lumious;
+            temp.green = lumious;
+            temp.blue = lumious;
+            values[p * width + q] = temp;
+
         }
         sem_post(s);
     }
 }
 
-int main(int argc, char* argv[]){
+int getColour(int colour, int blurAmount){
+    int blur = 0.5/blurAmount;
+    int newColour = colour * blur;
+    return newColour;
+}
 
-    if(argc != 3){
-        cout << "Please enter the input and output file names." << endl;
-        return 0;
+//This function does a horizontal blur which makes a photo as if it is in motion.
+void HorizontalBlur(key_t key, int h, int w, int pid){
+
+    if (pid > 0){
+        return;
     }
+
+    if(pid == -1){
+        cout<<"Error in fork"<<endl;
+    }
+
+    int shmid = shmget(key, sizeof(struct Pixel) * h * w, 0666 | IPC_CREAT);
+
+    if(shmid == -1){
+        cout<<"Error in shmget"<<endl;
+    }
+
+    struct Pixel *values;
+    values = (struct Pixel *)shmat(shmid, NULL, 0);
+    
+    if(values == (void *)-1){
+        cout<<"Error in shmat"<<endl;
+    }
+
+    struct Pixel temp;
+
+    vector<vector<Pixel>> matrixValues(h, vector<Pixel>(w));
+    
+    sem_t *s = sem_open(SEM_NAME, O_RDWR);
+
+    int blurAmount = 50;
+
+    for (int p = 0; p < h; p++){
+        sem_wait(s);
+        for (int q = 0; q < w; q++){
+
+            int redColour;
+            int valueRed = values[(p * w) + q].red;
+
+            redColour = valueRed/2;
+
+            int greenColour;
+            int valueGreen = values[(p * w) + q].green;
+
+            greenColour = valueGreen/2;
+
+            int blueColour;
+            int valueBlue = values[(p * w) + q].blue;
+
+            blueColour = valueBlue/2;
+
+            if((w-q) < blurAmount){
+
+                int newBlurAmount = w-q;
+
+                for(int u = q+1; u < w; u++){
+                    
+                    int idx = (p*w)+u;
+
+                    int redArg = values[idx].red;
+                    redColour += getColour(redArg, newBlurAmount);
+
+                    int greenArg = values[idx].green;
+                    greenColour += getColour(greenArg, newBlurAmount);
+
+                    int blueArg = values[idx].blue;
+                    blueColour += getColour(blueArg, newBlurAmount);
+                }
+
+                matrixValues[p][q].red = redColour;
+                matrixValues[p][q].blue = blueColour;
+                matrixValues[p][q].green = greenColour;
+                continue;
+            }
+
+            for (int i = 1; i < blurAmount; i++){
+                
+                int idx = (p*w)+(q+i);
+                
+                int redArg = values[idx].red;
+                redColour += getColour(redArg, blurAmount);
+
+                int greenArg = values[idx].green;
+                greenColour += getColour(greenArg, blurAmount);
+
+                int blueArg = values[idx].blue;
+                blueColour += getColour(blueArg, blurAmount);
+            }
+
+            matrixValues[p][q].red = redColour;
+            matrixValues[p][q].blue = blueColour;
+            matrixValues[p][q].green = greenColour;            
+        }
+        sem_post(s);
+    }
+
+    for (int i = h-1; i >= 0; i--){
+        for (int j = 0; j <= w - 1; j++){
+            values[(i * w) + j] = matrixValues[i][j];
+        }
+    }
+}
+
+int main(int argc, char *argv[]){
 
     int width;
     int height;
-    int maxASCII;
-    char ppmVersion[3];
-    FILE* inputImage = fopen(argv[1], "r");
+    int maxAscii;
 
-    if (inputImage == NULL) {
-        cout << "Input Image not available\n";
-        exit(1);
-    }
+    char PPM_VERSION[10];
+    FILE *input_image = fopen(argv[1], "r");
 
-    Pixel *values;
+    fscanf(input_image, "%s%d%d%d", PPM_VERSION, &width, &height, &maxAscii); // reading from file the PPM Version, Width, Height and Maximum Ascii value allowed.
+    
+    struct Pixel *values;
 
     key_t key = 0x1234;
-    int shmid = shmget(key, sizeof(class Pixel) * (height)*width, 0666 | IPC_CREAT);
+    int shmid = shmget(key, sizeof(struct Pixel) * (height) * width, 0666 | IPC_CREAT);
 
-    values = (class Pixel *)shmat(shmid, NULL, 0);
+    values = (struct Pixel *)shmat(shmid, NULL, 0);
 
-    Pixel t;
+    struct Pixel temp;
+    
+    //vector<vector<Pixel>> values(h, vector<Pixel>(w)); //Vector for reading and storing pixels as a matrix. 
+    int red, green, blue;
 
-    FILE* outputImage = fopen(argv[2], "w");
-
-    // Read from the file the PPM Version, Width, Height and Maximum Ascii value allowed.
-    fscanf(inputImage, "%s%d%d%d", ppmVersion, &width, &height, &maxASCII);
-
-    // make a vector to store the pixels 
-    // each pixel will be of type 'pixel'
-    vector<vector<Pixel>> matrix(height, vector<Pixel>(width));
-
-    int red;
-    int green;
-    int blue;
-
-    // read the pixels from the file and store them in the vector
-    for(int i=height-1; i>=0; i--){
-        for(int j=0; j<width; j++){
-            fscanf(inputImage, "%d%d%d", &red, &green, &blue);
-            matrix[i][j].setRed(red);
-            matrix[i][j].setGreen(green);
-            matrix[i][j].setBlue(blue);
+    for (int i = height-1; i >= 0; i--){
+        for (int j=0; j<width; j++){   
+            //Storing RGB pixel values into above created matrix.
+            fscanf(input_image, "%d%d%d", &red, &green, &blue);
+            temp.red = red;
+            temp.green = green;
+            temp.blue = blue;
+            values[(i * width) + j] = temp;
         }
     }
-    fclose(inputImage);
+
+    fclose(input_image);
 
     auto beginStamp = chrono::high_resolution_clock::now(); // Starting the clock
 
-    sem_t *s = sem_open(SEM_NAME, O_CREAT | O_EXCL, SEM_PERMS, INITIAL_VALUE); //creating named semaphore
+    sem_t *s = sem_open(SEM_NAME, O_CREAT | O_EXCL, SEM_PERMS, INITIAL_VALUE); //named semaphore
 
-    // call the function to convert the image to grayscale (T1 function)
-    RGBtoGrayScale(key, width, height, matrix, fork());
-    // call the function to apply the horizontal blur (T2 function)
-    HorizontalBlur(key, width, height, matrix, fork());
+    RGBtoGrayScale(key, height, width, fork());
+    HorizontalBlur(key, height, width, fork());
 
     wait(NULL);
     wait(NULL);
 
     auto endStamp = chrono::high_resolution_clock::now(); //Stopping the clock
-    auto duration = chrono::duration_cast<chrono::microseconds>(endStamp - beginStamp);//Calculating the time taken by T1 and T2
-    cout<<"Time Taken: "<<duration.count()<<" microseconds"<<endl;
 
-    // write the pixels to the output file
-    fprintf(outputImage, "%s\n%d %d\n%d\n", ppmVersion, width, height, maxASCII);
-    for(int i=height-1; i>=0; i--){
-        for(int j=0; j<width; j++){
-            fprintf(outputImage, "%d ", matrix[i][j].getRed());
-            fprintf(outputImage, "%d ", matrix[i][j].getGreen());
-            fprintf(outputImage, "%d ", matrix[i][j].getBlue());
+    // Calculating the time taken by T1 and T2.
+    auto duration = chrono::duration_cast<chrono::microseconds>(endStamp - beginStamp);
+
+    cout << "Time: " << duration.count() << " microseconds"<< endl;
+
+    FILE *output_image = fopen(argv[2], "w");
+    
+    fprintf(output_image, "%s\n%d %d\n%d\n", PPM_VERSION, width, height, maxAscii); // Printing to the file the PPM Version, Width, Height and Maximum Ascii value allowed.
+
+    for (int i=height-1; i>=0; i--){
+        for (int j=0; j<width; j++){  
+             // Printing RGB pixel values from above updated image matrix.
+            temp = values[(i * width) + j];
+
+            fprintf(output_image, "%d ", temp.red);
+            fprintf(output_image, "%d ", temp.green);
+            fprintf(output_image, "%d ", temp.blue);
         }
-        fprintf(outputImage, "\n");
+        fprintf(output_image, "\n");
     }
 
-    fclose(outputImage);
+    fclose(output_image);
     shmdt(values);
     shmctl(shmid,IPC_RMID,NULL);
     return 0;
