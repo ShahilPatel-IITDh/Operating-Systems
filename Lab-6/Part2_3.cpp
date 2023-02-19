@@ -347,8 +347,8 @@ void RGBtoGrayScale(char *input, int fileDescriptor1[2], int fileDescriptor2[2],
                 testVal8 = 1;
                 cout<<"testVal8: "<<testVal8<<endl;   
             }
-
-            values[i][j].red = red;
+            
+            values[i][j].setRed(red);
 
             bool flag9 = false;
             int testVal9 = 0;
@@ -357,7 +357,7 @@ void RGBtoGrayScale(char *input, int fileDescriptor1[2], int fileDescriptor2[2],
                 cout<<"testVal9: "<<testVal9<<endl;   
             }
 
-            values[i][j].green = green;
+            values[i][j].setGreen(green);
 
             bool flag10 = false;
             int testVal10 = 0;
@@ -365,7 +365,8 @@ void RGBtoGrayScale(char *input, int fileDescriptor1[2], int fileDescriptor2[2],
                 testVal10 = 1;
                 cout<<"testVal10: "<<testVal10<<endl;   
             }
-            values[i][j].blue = blue;
+
+            values[i][j].setBlue(blue);
         }
     }
 
@@ -387,7 +388,25 @@ void RGBtoGrayScale(char *input, int fileDescriptor1[2], int fileDescriptor2[2],
 
     Pixel forwardData[9];
 
-    for (int i = 0; i<height-2; i += 3){
+    for(int i=0; i<height; i++){
+        for(int j=0; j<width; j++){
+            int colourRed = values[i][j].getRed();
+            int colourGreen = values[i][j].getGreen();
+            int colourBlue = values[i][j].getBlue();
+
+            int luminous = (colourBlue*0.114) + (colourGreen*0.587) + (colourRed*0.299);
+
+            int newRed = luminous;
+            int newGreen = luminous;
+            int newBlue = luminous;
+
+            values[i][j].setRed(newRed);
+            values[i][j].setGreen(newGreen);
+            values[i][j].setBlue(newBlue);
+        }
+    }
+
+    for (int i = 0; i<=height-3; i += 3){
 
         bool flag13 = false;
         int testVal13 = 0;
@@ -396,7 +415,7 @@ void RGBtoGrayScale(char *input, int fileDescriptor1[2], int fileDescriptor2[2],
             cout<<"testVal13: "<<testVal13<<endl;   
         }
 
-        for (int j = 0; j<width-2; j += 3){
+        for (int j = 0; j<=width-3; j += 3){
 
             bool flag14 = false;
             int testVal14 = 0;
@@ -421,63 +440,6 @@ void RGBtoGrayScale(char *input, int fileDescriptor1[2], int fileDescriptor2[2],
             forwardData[7] = values[i + 2][j + 1];
             forwardData[8] = values[i + 2][j + 2];
             write(fileDescriptor1[1], forwardData, sizeof(forwardData));
-        }
-    }
-
-    for (int i = 0; i < height; i++){
-        bool flag16 = false;
-        int testVal16 = 0;
-        if(flag16){
-            testVal16 = 1;
-            cout<<"testVal16: "<<testVal16<<endl;   
-        }
-        for (int j = 0; j < width; j++){
-            int colourRed = values[i][i].getRed();
-            bool flag17 = false;
-            int testVal17 = 0;
-            if(flag17){
-                testVal17 = 1;
-                cout<<"testVal17: "<<testVal17<<endl;   
-            }
-            int colourGreen = values[i][j].getGreen();
-            bool flag18 = false;
-            int testVal18 = 0;
-            if(flag18){
-                testVal18 = 1;
-                cout<<"testVal18: "<<testVal18<<endl;   
-            }
-            int colourBlue = values[i][j].getBlue();
-
-            // weighted average of red, green and blue is calculated and then assigned to all three values
-            // this is done to convert the image to grayscale
-            // wighted average = (0.299 * red) + (0.587 * green) + (0.114 * blue)
-
-            int luminous= (colourBlue * 0.114) + (colourRed * 0.299) + (colourGreen * 0.587);
-            int newRed = luminous;
-            bool flag19 = false;
-            int testVal19 = 0;
-            if(flag19){
-                testVal19 = 1;
-                cout<<"testVal19: "<<testVal19<<endl;   
-            }
-            int newGreen = luminous;
-            bool flag20 = false;
-            int testVal20 = 0;
-            if(flag20){
-                testVal20 = 1;
-                cout<<"testVal20: "<<testVal20<<endl;   
-            }
-            int newBlue = luminous;
-
-            bool flag21 = false;
-            int testVal21 = 0;
-            if(flag21){
-                testVal21 = 1;
-                cout<<"testVal21: "<<testVal21<<endl;   
-            }
-            values[i][j].setRed(newRed);
-            values[i][j].setGreen(newGreen);
-            values[i][j].setBlue(newBlue);
         }
     }
 
