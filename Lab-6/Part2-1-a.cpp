@@ -193,14 +193,9 @@ int main(int argc, char* argv[]){
     thread1.join();
     thread2.join();
 
-    // call the function to convert the image to grayscale (T1 function)
-    // RGBtoGrayScale(width, height, matrix);
-
-    // call the function to apply the horizontal blur (T2 function)
-    // HorizontalBlur(width, height, matrix);
-
     auto endStamp = chrono::high_resolution_clock::now(); //Stopping the clock
     auto duration = chrono::duration_cast<chrono::microseconds>(endStamp - beginStamp);//Calculating the time taken by T1 and T2
+    
     cout<<"Time Taken: "<<duration.count()<<" microseconds"<<endl;
 
     // write the pixels to the output file

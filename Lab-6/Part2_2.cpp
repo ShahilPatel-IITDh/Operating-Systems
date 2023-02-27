@@ -15,10 +15,8 @@ using namespace std;
 #define SEM_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
 #define INITIAL_VALUE 1
 
-//Creating struct structure for reading pixels easily in ppm3
-
-
-// Class is given segmentation fault
+// Creating struct structure for reading pixels easily in ppm3
+// Class is giving segmentation fault
 struct Pixel{
     int red;
     int green;

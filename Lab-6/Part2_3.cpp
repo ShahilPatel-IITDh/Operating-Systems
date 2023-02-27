@@ -294,7 +294,6 @@ void RGBtoGrayScale(char *input, int fileDescriptor1[2], int fileDescriptor2[2],
             write(fileDescriptor1[1], forwardData, sizeof(forwardData));
         }
     }
-
     exit(0);
 }
 

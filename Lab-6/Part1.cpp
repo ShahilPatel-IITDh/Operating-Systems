@@ -65,11 +65,8 @@ void HorizontalBlur(int width, int height, vector<vector<Pixel>> &matrix){
                 // iterate over the pixels to the right of the current pixel
                 for(int k = j+1; k < width; k++){
                     colourRed += getNewColour(matrix[i][k].getRed(), newBlurAmount);
-                    // colourRed += (matrix[i][k].getRed() * (0.5/newBlurAmount));
                     colourGreen += getNewColour(matrix[i][k].getGreen(), newBlurAmount);
-                    // colourGreen += (matrix[i][k].getGreen() * (0.5/newBlurAmount));
-                    colourBlue += getNewColour(matrix[i][k].getBlue(), newBlurAmount);
-                    // colourBlue += (matrix[i][k].getBlue() * (0.5/newBlurAmount));   
+                    colourBlue += getNewColour(matrix[i][k].getBlue(), newBlurAmount); 
                 }
 
                 matrix[i][j].setRed(colourRed);
@@ -80,13 +77,11 @@ void HorizontalBlur(int width, int height, vector<vector<Pixel>> &matrix){
 
             // the pixel values are updated by adding the new colour value to the current pixel value
             // the new colour value is calculated by multiplying the colour value of the pixel to be considered for blurring by the weight
+
             for (int k = 1; k < blurAmount; k++){
                 colourRed += getNewColour(matrix[i][j+k].getRed(), blurAmount);
-                // colourRed += matrix[i][j+k].getRed() * (0.5/blurAmount);
                 colourGreen += getNewColour(matrix[i][j+k].getGreen(), blurAmount);
-                // colourGreen += matrix[i][j+k].getGreen() * (0.5/blurAmount);
                 colourBlue += getNewColour(matrix[i][j+k].getBlue(), blurAmount);
-                // colourBlue += matrix[i][j+k].getBlue() * (0.5/blurAmount);
             }
 
             // update the pixel values
