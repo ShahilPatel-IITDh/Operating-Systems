@@ -199,52 +199,16 @@ void HorizontalBlur(char *prevInput, int fileDescriptor1[2], int fileDescriptor2
     int initialVal = head[0].getHeight() - 1;
     for (int i = initialVal; i >= 0; i--){
         // Printing RGB pixel values from above updated image values.
-        bool flag = false;
-        int testVal = 0;
-        if(flag){
-            testVal = 1;
-            cout<<"testVal: "<<testVal<<endl;   
-
-        }
         for (int j = 0; j <= head[0].getWidth() - 1; j++){
             // Printing RGB pixel values from above updated image values.
-            bool flag2 = false;
-            int testVal2 = 0;
-            if(flag2){
-                testVal2 = 1;
-                cout<<"testVal2: "<<testVal2<<endl;   
-            }
-            fprintf(outputImage, "%d ", values[i][j].red);
-
-            bool flag3 = false;
-            int testVal3 = 0;
-            if(flag3){
-                testVal3 = 1;
-                cout<<"testVal3: "<<testVal3<<endl;   
-            }
-            
+            fprintf(outputImage, "%d ", values[i][j].red);            
             fprintf(outputImage, "%d ", values[i][j].green);
-
-            bool flag4 = false;
-            int testVal4 = 0;
-            if(flag4){
-                testVal4 = 1;
-                cout<<"testVal4: "<<testVal4<<endl;   
-            }
             fprintf(outputImage, "%d ", values[i][j].blue);
         }
-        
         fprintf(outputImage, "\n");
     }
     fclose(outputImage);
     exit(0);
-
-    bool flag5 = false;
-    int testVal5 = 0;   
-    if(flag5){
-        testVal5 = 1;
-        cout<<"testVal5: "<<testVal5<<endl;   
-    }
 }
 
 // Function to converts an image to Grayscale by iterating over pixels and then rows and updating pixel values
@@ -256,14 +220,6 @@ void RGBtoGrayScale(char *input, int fileDescriptor1[2], int fileDescriptor2[2],
     if(pid == -1){
         cout<<"Error in creating child process"<<endl;
     }
-
-    // Read the fileInfo object from the pipe.
-    bool flag = false;
-    int testVal = 0;
-    if(flag){
-        testVal = 1;
-        cout<<"testVal: "<<testVal<<endl;   
-    }
     //open ppm file and read
     int height;
     int width;
@@ -272,120 +228,37 @@ void RGBtoGrayScale(char *input, int fileDescriptor1[2], int fileDescriptor2[2],
 
     // Read input file
     FILE *input_image = fopen(input, "r");
-
-    bool flag2 = false;
-    int testVal2 = 0;
-    if(flag2){
-        testVal2 = 1;
-        cout<<"testVal2: "<<testVal2<<endl;   
-    }
     // fileInfo is a struct that stores the PPM Version, Width, Height and Maximum Ascii value allowed.
 
     fileInfo head[1];
     fscanf(input_image, "%s%d%d%d", head->PPM_VERSION, &width, &height, &maxASCII); // reading from file the PPM Version, Width, Height and Maximum Ascii value allowed.
-    
-
-    bool flag3 = false;
-    int testVal3 = 0;
-    if(flag3){
-        testVal3 = 1;
-        cout<<"testVal3: "<<testVal3<<endl;   
-    }
 
     // set the values of the fileInfo object 'head'.
     head[0].setHeight(height);
     head[0].setWidth(width);
     head[0].setMaxASCII(maxASCII);
 
-
-    bool flag4 = false;
-    int testVal4 = 0;
-    if(flag4){
-        testVal4 = 1;
-        cout<<"testVal4: "<<testVal4<<endl;   
-    }
-
     // Write the fileInfo object 'head' to the pipe.
     write(fileDescriptor2[1], head, sizeof(fileInfo));
     
     vector<vector<Pixel>> values(height, vector<Pixel>(width)); //Vector for reading and storing pixels as a values.
 
-    bool flag5 = false;
-    int testVal5 = 0;
-    if(flag5){
-        testVal5 = 1;
-        cout<<"testVal5: "<<testVal5<<endl;   
-    }
-
     int red;
     int green;
     int blue;
 
-    bool flag6 = false;
-    int testVal6 = 0;
-    if(flag6){
-        testVal6 = 1;
-        cout<<"testVal6: "<<testVal6<<endl;   
-    }
-
     for (int i = height-1; i >= 0; i--){
-
-        bool flag7 = false;
-        int testVal7 = 0;
-        if(flag7){
-            testVal7 = 1;
-            cout<<"testVal7: "<<testVal7<<endl;   
-        }
 
         for (int j = 0; j <= width - 1; j++)
         {   //Storing RGB pixel values into above created values.
-            fscanf(input_image, "%d%d%d", &red, &green, &blue);
-
-            bool flag8 = false;
-            int testVal8 = 0;
-            if(flag8){
-                testVal8 = 1;
-                cout<<"testVal8: "<<testVal8<<endl;   
-            }
-            
+            fscanf(input_image, "%d%d%d", &red, &green, &blue);            
             values[i][j].setRed(red);
-
-            bool flag9 = false;
-            int testVal9 = 0;
-            if(flag9){
-                testVal9 = 1;
-                cout<<"testVal9: "<<testVal9<<endl;   
-            }
-
             values[i][j].setGreen(green);
-
-            bool flag10 = false;
-            int testVal10 = 0;
-            if(flag10){
-                testVal10 = 1;
-                cout<<"testVal10: "<<testVal10<<endl;   
-            }
-
             values[i][j].setBlue(blue);
         }
     }
 
-    bool flag11 = false;
-    int testVal11 = 0;
-    if(flag11){
-        testVal11 = 1;
-        cout<<"testVal11: "<<testVal11<<endl;   
-    }
-
     fclose(input_image);
-
-    bool flag12 = false;
-    int testVal12 = 0;
-    if(flag12){
-        testVal12 = 1;
-        cout<<"testVal12: "<<testVal12<<endl;   
-    }
-
     Pixel forwardData[9];
 
     for(int i=0; i<height; i++){
@@ -407,34 +280,13 @@ void RGBtoGrayScale(char *input, int fileDescriptor1[2], int fileDescriptor2[2],
     }
 
     for (int i = 0; i<=height-3; i += 3){
-
-        bool flag13 = false;
-        int testVal13 = 0;
-        if(flag13){
-            testVal13 = 1;
-            cout<<"testVal13: "<<testVal13<<endl;   
-        }
-
         for (int j = 0; j<=width-3; j += 3){
-
-            bool flag14 = false;
-            int testVal14 = 0;
-            if(flag14){
-                testVal14 = 1;
-                cout<<"testVal14: "<<testVal14<<endl;   
-            }
 
             forwardData[0] = values[i][j];
             forwardData[1] = values[i][j + 1];
             forwardData[2] = values[i][j + 2];
             forwardData[3] = values[i + 1][j];
             forwardData[4] = values[i + 1][j + 1];
-            bool flag15 = false;
-            int testVal15 = 0;
-            if(flag15){
-                testVal15 = 1;
-                cout<<"testVal15: "<<testVal15<<endl;   
-            }
             forwardData[5] = values[i + 1][j + 2];
             forwardData[6] = values[i + 2][j];
             forwardData[7] = values[i + 2][j + 1];
@@ -452,22 +304,8 @@ int main(int argc, char* argv[]){
     int fileDescriptor1[2];
     int data1;
     data1 = pipe(fileDescriptor1);
-
-    bool flag22 = false;
-    int testVal22 = 0;
-    if(flag22){
-        testVal22 = 1;
-        cout<<"testVal22: "<<testVal22<<endl;   
-    }
     if (data1 == -1){
         perror("pipe");
-    }
-
-    bool flag23 = false;
-    int testVal23 = 0;
-    if(flag23){
-        testVal23 = 1;
-        cout<<"testVal23: "<<testVal23<<endl;   
     }
 
     int fileDescriptor2[2];
