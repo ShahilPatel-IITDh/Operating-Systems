@@ -100,7 +100,10 @@ void HorizontalBlur(char *prevInput, int fileDescriptor1[2], int fileDescriptor2
     //for the pipe
 
     // getData will be used to store the 9 pixels that will be read from the pipe.
-    // The 9 pixels will be stored in the following order:
+    // The 9 pixels will be stored in the following order: 
+    // 0 1 2
+    // 3 4 5
+    // 6 7 8
     Pixel getData[9];
 
     // The head array will be used to store the header information of the image.
