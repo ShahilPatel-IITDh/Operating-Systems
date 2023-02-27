@@ -78,7 +78,8 @@ void HorizontalBlur(int width, int height, vector<vector<Pixel>> &matrix){
                 continue;
             }
 
-            // iterate over the pixels to the right of the current pixel, blurAmount number of times
+            // the pixel values are updated by adding the new colour value to the current pixel value
+            // the new colour value is calculated by multiplying the colour value of the pixel to be considered for blurring by the weight
             for (int k = 1; k < blurAmount; k++){
                 colourRed += getNewColour(matrix[i][j+k].getRed(), blurAmount);
                 // colourRed += matrix[i][j+k].getRed() * (0.5/blurAmount);
