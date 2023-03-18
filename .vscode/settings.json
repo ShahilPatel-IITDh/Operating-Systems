@@ -72,7 +72,8 @@
         "utility": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "assert.h": "c"
     },
     "cSpell.words": [
         "Occurence"

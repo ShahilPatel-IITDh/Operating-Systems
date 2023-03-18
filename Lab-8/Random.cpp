@@ -48,7 +48,8 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
 		// If the set is full then need to perform FIFO i.e. remove the first page of the queue from set and queue both and insert the current page
 		else{
             if(swapSet.find(pages[i]) != swapSet.end()){
-                // cout<<"Control is here"<<endl;
+                
+                int index = rand(numFrames)
                 // remove the page from swap set
                 int val = mainMemory.front();
                 // Pop the first page from the queue
