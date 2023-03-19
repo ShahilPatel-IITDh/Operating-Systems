@@ -11,6 +11,7 @@ with open('csvFIFO.csv','r') as csvFIFO:
 		y.append(row[1])
 
 plt.plot(x, y, color = 'red', linestyle = 'solid', marker = 'o',label = "Frames vs Page Faults")
+plt.title('FIFO Page Replacement Algorithm')
 
 plt.xlabel('Frames')
 plt.ylabel('Page Faults')
