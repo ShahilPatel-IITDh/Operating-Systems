@@ -130,7 +130,5 @@ int main(int argc, char *argv[]){
 
     // close csv file
     csvRandom.close();
-    // print number of page faults
-    cout << "Number of page faults: " << pageFaults(pages, numPages, numFrames, numBlocks) << endl;
     return 0;
 }

@@ -131,9 +131,8 @@ int main(int argc, char *argv[]){
         csvFIFO << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
         frames++;
     }
+    
     // close csv file
     csvFIFO.close();
-    // print number of page faults
-    cout << "Number of page faults: " << pageFaults(pages, numPages, numFrames, numBlocks) << endl;
     return 0;
 }

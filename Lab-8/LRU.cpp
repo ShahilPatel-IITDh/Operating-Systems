@@ -25,7 +25,6 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
 		if (mainMemorySet.size() < mainMemorySize){
 			if(swapSet.find(pages[i]) != swapSet.end()){
                 // remove the page from swap set
-				// cout<<"Page "<<pages[i]<<" is in swap set"<<endl;
                 swapSet.erase(pages[i]);
                 // insert the page into main memory set
                 mainMemorySet.insert(pages[i]);
@@ -136,6 +135,7 @@ int main(int argc, char *argv[]){
         csvLRU << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
         frames++;
     }
+	
 	// close csv file
 	csvLRU.close();
     return 0;
