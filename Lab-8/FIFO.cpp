@@ -102,35 +102,34 @@ int main(int argc, char *argv[]){
     numBlocks = atoi(argv[3]);
 
     // open input file for reading
-    ifstream file(argv[4]);
+    ifstream inputFile(argv[4]);
     // create a csv file 
     ofstream csvFIFO;
     csvFIFO.open("csvFIFO.csv");
 
     // check if file opened successfully
-    if (!file.is_open()) {
+    if (!inputFile.is_open()) {
         cout << "Error opening input file!" << endl;
         return 1;
     }
 
     // simulate FIFO page replacement policy
-    // file>>pageNum means read a number from the file and store it in pageNum
+    // inputFile>>pageNum means read a number from the file and store it in pageNum
     vector<int> pages(numPages);
     int i=0;
     int pageNum=0;
-    while (file >> pageNum) {
+    while (inputFile >> pageNum) {
         pages[i] = pageNum;
         i++;
     }
 
     // close input file
-    file.close();
+    inputFile.close();
     // Print the number of page faults along with the numFrames in csv file
     int frames = 1;
-    int jump = numFrames/5;
 	while(frames<=numFrames){
         csvFIFO << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
-        frames+=(jump-1);
+        frames++;
     }
     // close csv file
     csvFIFO.close();

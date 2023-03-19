@@ -66,6 +66,7 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
 				int val;
 
 				for (auto i=mainMemorySet.begin(); i!=mainMemorySet.end(); i++){
+					// Check if the current page is less than least recently used pages, if yes then update lru, val is the least recently used page
 					if (mainMemoryMap[*i] < lru){
 						// Update the least recently used pages, val and lru where lru is the least recently used page and val is the page number
 						lru = mainMemoryMap[*i];
@@ -87,7 +88,6 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
 			mainMemoryMap[pages[i]] = i;
 		}
 	}
-
 	return pageFaults;
 }
 
@@ -105,40 +105,38 @@ int main(int argc, char *argv[]){
     numFrames = atoi(argv[2]);
     numBlocks = atoi(argv[3]);
 
-    // open input file for reading
-    ifstream file(argv[4]);
-	// create a csv file
+    // open input File for reading
+    ifstream inputFile(argv[4]);
+	// create a csv File
 	ofstream csvLRU;
 	csvLRU.open("csvLRU.csv");
 
-    if (!file.is_open()) {
-        cout << "Error opening input file!" << endl;
+    if (!inputFile.is_open()) {
+        cout << "Error opening input inputFile!" << endl;
         return 1;
     }
 
     // simulate FIFO page replacement policy
-    // file>>pageNum means read a number from the file and store it in pageNum
+    // inputFile>>pageNum means read a number from the input file and store it in pageNum
     vector<int> pages(numPages);
     int i=0;
     int pageNum=0;
-    while (file >> pageNum) {
+    while (inputFile >> pageNum) {
         pages[i] = pageNum;
         i++;
     }
 
-    // close input file
-    file.close();
+    // close input File
+    inputFile.close();
+
 	// print the number of page faults along with frames used in csv file
 	int frames = 1;
-	int jump = numFrames/5;
 
 	while(frames<=numFrames){
         csvLRU << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
-        frames+=(jump-1);
+        frames++;
     }
 	// close csv file
 	csvLRU.close();
-    // print number of page faults
-    cout << "Number of page faults: " << pageFaults(pages, numPages, numFrames, numBlocks) << endl;
     return 0;
 }

@@ -66,7 +66,9 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
             }
 
 			else if (mainMemorySet.find(pages[i]) == mainMemorySet.end()){
+                // generate a random number between 0 and mainMemorySize-1, this will be the index of the page to be removed from main memory
 				int index = rand() % mainMemorySize;
+                // remove the page at the index from main memory
                 int removedPage = mainMemory[index];
                 // Remove the indexes page from the set
                 mainMemorySet.erase(removedPage);
@@ -121,10 +123,9 @@ int main(int argc, char *argv[]){
 
     // print the number of page faults along with the number of frames in a csv file
     int frames = 1;
-    int jump = numFrames/5;
     while(frames<=numFrames){
         csvRandom << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
-        frames+=(jump-1);
+        frames++;
     }
 
     // close csv file
