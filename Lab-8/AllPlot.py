@@ -27,9 +27,9 @@ with open('csvFIFO.csv','r') as csvFIFO, open('csvLRU.csv','r') as csvLRU, open(
 		yRandom.append(row[1])
 	
 # plot all the data
-plt.plot(xFIFO, yFIFO, color = 'blue', linestyle = 'solid', marker = 'o',label = "FIFO")
-plt.plot(xLRU, yLRU, color = 'green', linestyle = 'solid', marker = 'o',label = "LRU")
-plt.plot(xRandom, yRandom, color = 'red', linestyle = 'solid', marker = 'o',label = "Random")
+plt.plot(xFIFO, yFIFO, color = 'blue', linestyle = 'solid', marker = 'o', label = "FIFO")
+plt.plot(xLRU, yLRU, color = 'green', linestyle = 'solid', marker = 'o', label = "LRU")
+plt.plot(xRandom, yRandom, color = 'red', linestyle = 'solid', marker = 'o', label = "Random")
 
 plt.xlabel('Frames')
 plt.ylabel('Page Faults')
