@@ -95,6 +95,14 @@ void takeInput(ifstream& inputFile, vector<int>& pages, int numPages, int pageNu
 	}
 }
 
+void generateCSV(ofstream& csvRandom, int frames, int numFrames, vector<int>& pages, int numPages, int numBlocks){
+    // print the number of page faults along with the number of frames in a csv file
+    while(frames<=numFrames){
+        csvRandom << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
+        frames++;
+    }
+}
+
 int main(int argc, char *argv[]){
     int numPages, numFrames, numBlocks;
     // check if correct number of arguments are passed
@@ -131,11 +139,7 @@ int main(int argc, char *argv[]){
     inputFile.close();
 
     // print the number of page faults along with the number of frames in a csv file
-    int frames = 1;
-    while(frames<=numFrames){
-        csvRandom << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
-        frames++;
-    }
+    generateCSV(csvRandom, 1, numFrames, pages, numPages, numBlocks);
 
     // close csv file
     csvRandom.close();

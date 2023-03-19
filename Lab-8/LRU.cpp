@@ -114,6 +114,14 @@ void takeInput(ifstream& inputFile, vector<int>& pages, int numPages, int pageNu
 	}
 }
 
+
+void generateCSV(ofstream& csvLRU, int frames, int numFrames, vector<int>& pages, int numPages, int numBlocks){
+	while(frames<=numFrames){
+		csvLRU << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
+		frames++;
+	}
+}
+
 // Driver code
 int main(int argc, char *argv[]){
 
@@ -151,12 +159,7 @@ int main(int argc, char *argv[]){
     inputFile.close();
 
 	// print the number of page faults along with frames used in csv file
-	int frames = 1;
-
-	while(frames<=numFrames){
-        csvLRU << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
-        frames++;
-    }
+	generateCSV(csvLRU, 1, numFrames, pages, numPages, numBlocks);
 
 	// close csv file
 	csvLRU.close();

@@ -99,6 +99,13 @@ void takeInput(ifstream& inputFile, vector<int>& pages, int numPages, int pageNu
 	}
 }
 
+void generateCSV(ofstream& csvFIFO, int frames, int numFrames, vector<int>& pages, int numPages, int numBlocks){
+    while(frames<=numFrames){
+        csvFIFO << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
+        frames++;
+    }
+}
+
 int main(int argc, char *argv[]){
     int numPages, numFrames, numBlocks;
     // check if correct number of arguments are passed
@@ -134,12 +141,9 @@ int main(int argc, char *argv[]){
 
     // close input file
     inputFile.close();
+
     // Print the number of page faults along with the numFrames in csv file
-    int frames = 1;
-	while(frames<=numFrames){
-        csvFIFO << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
-        frames++;
-    }
+    generateCSV(csvFIFO, 1, numFrames, pages, numPages, numBlocks);
 
     // close csv file
     csvFIFO.close();
