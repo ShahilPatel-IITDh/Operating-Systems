@@ -61,13 +61,15 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
 
 			// Check if current page is not already present in the set
 			else if (mainMemorySet.find(pages[i]) == mainMemorySet.end()){
-				// Find the least recently used pages
-				// that is present in the set
-				int lru = INT_MAX, val;
-				for (auto it=mainMemorySet.begin(); it!=mainMemorySet.end(); it++){
-					if (mainMemoryMap[*it] < lru){
-						lru = mainMemoryMap[*it];
-						val = *it;
+				// Find the least recently used pages that is present in the set
+				int lru = INT_MAX;
+				int val;
+
+				for (auto i=mainMemorySet.begin(); i!=mainMemorySet.end(); i++){
+					if (mainMemoryMap[*i] < lru){
+						// Update the least recently used pages, val and lru where lru is the least recently used page and val is the page number
+						lru = mainMemoryMap[*i];
+						val = *i;
 					}
 				}
 
@@ -105,6 +107,9 @@ int main(int argc, char *argv[]){
 
     // open input file for reading
     ifstream file(argv[4]);
+	// create a csv file
+	ofstream csvLRU;
+	csvLRU.open("csvLRU.csv");
 
     if (!file.is_open()) {
         cout << "Error opening input file!" << endl;
@@ -123,6 +128,14 @@ int main(int argc, char *argv[]){
 
     // close input file
     file.close();
+	// print the number of page faults along with frames used in csv file
+	int frames=5;
+	while(frames<=numFrames){
+        csvLRU << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
+        frames+=5;
+    }
+	// close csv file
+	csvLRU.close();
     // print number of page faults
     cout << "Number of page faults: " << pageFaults(pages, numPages, numFrames, numBlocks) << endl;
     return 0;
