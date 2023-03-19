@@ -103,7 +103,11 @@ int main(int argc, char *argv[]){
 
     // open input file for reading
     ifstream file(argv[4]);
+    // create a csv file 
+    ofstream csvFIFO;
+    csvFIFO.open("csvFIFO.csv");
 
+    // check if file opened successfully
     if (!file.is_open()) {
         cout << "Error opening input file!" << endl;
         return 1;
@@ -121,6 +125,14 @@ int main(int argc, char *argv[]){
 
     // close input file
     file.close();
+    // Print the number of page faults along with the numFrames in csv file
+    int frames=5;
+	while(frames<=numFrames){
+        csvFIFO << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
+        frames+=5;
+    }
+    // close csv file
+    csvFIFO.close();
     // print number of page faults
     cout << "Number of page faults: " << pageFaults(pages, numPages, numFrames, numBlocks) << endl;
     return 0;
