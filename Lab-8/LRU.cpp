@@ -129,10 +129,12 @@ int main(int argc, char *argv[]){
     // close input file
     file.close();
 	// print the number of page faults along with frames used in csv file
-	int frames=5;
+	int frames = 1;
+	int jump = numFrames/5;
+
 	while(frames<=numFrames){
         csvLRU << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
-        frames+=5;
+        frames+=(jump-1);
     }
 	// close csv file
 	csvLRU.close();

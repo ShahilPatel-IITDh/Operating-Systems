@@ -118,12 +118,15 @@ int main(int argc, char *argv[]){
 
     // close input file
     file.close();
+
     // print the number of page faults along with the number of frames in a csv file
-    int frames = 5;
+    int frames = 1;
+    int jump = numFrames/5;
     while(frames<=numFrames){
         csvRandom << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
-        frames+=5;
+        frames+=(jump-1);
     }
+
     // close csv file
     csvRandom.close();
     // print number of page faults
