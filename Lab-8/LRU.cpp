@@ -21,6 +21,16 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
             exit(0);
         }
 
+		if(swapSet.size()==0){
+			bool checkSize = false;
+			for(auto i=mainMemorySet.begin(); i!=mainMemorySet.end(); i++){
+				if(mainMemoryMap[*i] == INT_MAX){
+					checkSize = true;
+					break;
+				}
+			}
+		}
+
 		// Check if the set can hold more pages
 		if (mainMemorySet.size() < mainMemorySize){
 			if(swapSet.find(pages[i]) != swapSet.end()){
@@ -45,16 +55,21 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
 		// If the set is full then need to perform lru i.e. remove the least recently used page and insert the current page
 		else{
 			if(swapSet.find(pages[i]) != swapSet.end()){
-				// val is the least recently used page
-				int val = mainMemoryMap[pages[i]];
-				// Remove the mainMemory page from the set
-				mainMemorySet.erase(val);
-				// insert the current page in the set
-				swapSet.erase(pages[i]);
 				// Increment page faults
 				pageFaults++;
+
+				// val is the least recently used page
+				int val = mainMemoryMap[pages[i]];
+
+				// Remove the mainMemory page from the set
+				mainMemorySet.erase(val);
+
+				// insert the current page in the set
+				swapSet.erase(pages[i]);
+				
 				// push the current page into the queue
 				mainMemorySet.insert(pages[i]);
+				// push the least recently used page into the swap set
 				swapSet.insert(val);
             }
 
@@ -63,7 +78,6 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
 				// Find the least recently used pages that is present in the set
 				int lru = INT_MAX;
 				int val;
-
 				for (auto i=mainMemorySet.begin(); i!=mainMemorySet.end(); i++){
 					// Check if the current page is less than least recently used pages, if yes then update lru, val is the least recently used page
 					if (mainMemoryMap[*i] < lru){
@@ -72,15 +86,14 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
 						val = *i;
 					}
 				}
+				// Increment page faults
+				pageFaults++;
 
 				// Remove the mainMemoryMap page
 				mainMemorySet.erase(val);
 
 				// insert the current page
 				mainMemorySet.insert(pages[i]);
-
-				// Increment page faults
-				pageFaults++;
 			}
 
 			// Update the current page index
@@ -90,8 +103,20 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
 	return pageFaults;
 }
 
+// Function to take input from the input file
+void takeInput(ifstream& inputFile, vector<int>& pages, int numPages, int pageNum, int i){
+	while (inputFile >> pageNum) {
+		pages[i] = pageNum;
+		i++;
+		if(i==numPages){
+			break;
+		}
+	}
+}
+
 // Driver code
 int main(int argc, char *argv[]){
+
     int numPages, numFrames, numBlocks;
     // check if correct number of arguments are passed
     if (argc != 5) {
@@ -120,10 +145,7 @@ int main(int argc, char *argv[]){
     vector<int> pages(numPages);
     int i=0;
     int pageNum=0;
-    while (inputFile >> pageNum) {
-        pages[i] = pageNum;
-        i++;
-    }
+	takeInput(inputFile, pages, numPages, pageNum, i);
 
     // close input File
     inputFile.close();
@@ -135,7 +157,7 @@ int main(int argc, char *argv[]){
         csvLRU << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
         frames++;
     }
-	
+
 	// close csv file
 	csvLRU.close();
     return 0;

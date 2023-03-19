@@ -84,6 +84,17 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
 	return pageFaults;
 }
 
+// Function to take input from the input file
+void takeInput(ifstream& inputFile, vector<int>& pages, int numPages, int pageNum, int i){
+	while (inputFile >> pageNum) {
+		pages[i] = pageNum;
+		i++;
+		if(i==numPages){
+			break;
+		}
+	}
+}
+
 int main(int argc, char *argv[]){
     int numPages, numFrames, numBlocks;
     // check if correct number of arguments are passed
@@ -98,12 +109,12 @@ int main(int argc, char *argv[]){
     numBlocks = atoi(argv[3]);
 
     // open input file for reading
-    ifstream file(argv[4]);
+    ifstream inputFile(argv[4]);
     // create a csv file
     ofstream csvRandom;
     csvRandom.open("csvRandom.csv");
 
-    if (!file.is_open()) {
+    if (!inputFile.is_open()) {
         cout << "Error opening input file!" << endl;
         return 1;
     }
@@ -111,15 +122,13 @@ int main(int argc, char *argv[]){
     // simulate FIFO page replacement policy
     // file>>pageNum means read a number from the file and store it in pageNum
     vector<int> pages(numPages);
+    
     int i=0;
     int pageNum=0;
-    while (file >> pageNum) {
-        pages[i] = pageNum;
-        i++;
-    }
+	takeInput(inputFile, pages, numPages, pageNum, i);
 
     // close input file
-    file.close();
+    inputFile.close();
 
     // print the number of page faults along with the number of frames in a csv file
     int frames = 1;
