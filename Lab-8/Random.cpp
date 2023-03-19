@@ -9,7 +9,7 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
     unordered_set<int> swapSet;
 
 	// To store the pages in FIFO manner
-	queue<int> mainMemory;
+	vector<int> mainMemory;
 
 	// Start from initial page
 	int pageFaults = 0;
@@ -30,7 +30,7 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
                 // insert the page into main memory set
                 mainMemorySet.insert(pages[i]);
                 // push the page into main memory queue
-                mainMemory.push(pages[i]);
+                mainMemory.emplace_back(pages[i]);
                 // increment page faults
                 pageFaults++;
             }
@@ -41,7 +41,7 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
 				// increment page fault
 				pageFaults++;
 				// Push the current page into the queue
-				mainMemory.push(pages[i]);
+				mainMemory.emplace_back(pages[i]);
 			}
 		}
 
@@ -49,40 +49,33 @@ int pageFaults(vector<int>& pages, int numPages, int mainMemorySize, int blocks)
 		else{
             if(swapSet.find(pages[i]) != swapSet.end()){
                 
-                int index = rand(numFrames)
-                // remove the page from swap set
-                int val = mainMemory.front();
-                // Pop the first page from the queue
-                mainMemory.pop();
+                int index = rand() % mainMemorySize;
+                int removedPage = mainMemory[index];
                 // Remove the mainMemory page from the set
-                mainMemorySet.erase(val);
-                // insert the current page in the set
+                mainMemorySet.erase(removedPage);
+                // Erase page[i] from swapset
                 swapSet.erase(pages[i]);
-                // push the current page into the queue
+                // Insert removedPage into swapset
+                swapSet.insert(removedPage);
+                // insert the current page in the set
                 mainMemorySet.insert(pages[i]);
-                // Increment page faults
-                mainMemory.push(pages[i]);
-                // add the page to swap set
+                // push the current page into the queue
+                mainMemory[index] = pages[i];
+                // increment page faults
                 pageFaults++;
-                // add the page to swap set
-                swapSet.insert(val);
             }
 
 			else if (mainMemorySet.find(pages[i]) == mainMemorySet.end()){
-				// Store the first page in the queue to be used to find and erase the page from the set
-				int val = mainMemory.front();
-				// Pop the first page from the queue
-				mainMemory.pop();
-				// Remove the mainMemory page from the set
-				mainMemorySet.erase(val);
-				// insert the current page in the set
-				mainMemorySet.insert(pages[i]);
-				// push the current page into the queue
-				mainMemory.push(pages[i]);
-				// Increment page faults
-				pageFaults++;
-                // add the page to swap set
-                swapSet.insert(val);
+				int index = rand() % mainMemorySize;
+                int removedPage = mainMemory[index];
+                // Remove the indexes page from the set
+                mainMemorySet.erase(removedPage);
+                // insert the current page in the set
+                mainMemorySet.insert(pages[i]);
+                // push the current page into the queue
+                mainMemory[index] = pages[i];
+                // increment page faults
+                pageFaults++;
 			}
 		}
 	}
@@ -104,6 +97,9 @@ int main(int argc, char *argv[]){
 
     // open input file for reading
     ifstream file(argv[4]);
+    // create a csv file
+    ofstream csvRandom;
+    csvRandom.open("csvRandom.csv");
 
     if (!file.is_open()) {
         cout << "Error opening input file!" << endl;
@@ -122,6 +118,14 @@ int main(int argc, char *argv[]){
 
     // close input file
     file.close();
+    // print the number of page faults along with the number of frames in a csv file
+    int frames = 5;
+    while(frames<=numFrames){
+        csvRandom << frames << "," << pageFaults(pages, numPages, frames, numBlocks) << endl;
+        frames+=5;
+    }
+    // close csv file
+    csvRandom.close();
     // print number of page faults
     cout << "Number of page faults: " << pageFaults(pages, numPages, numFrames, numBlocks) << endl;
     return 0;
