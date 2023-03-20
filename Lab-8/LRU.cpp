@@ -122,7 +122,6 @@ void generateCSV(ofstream& csvLRU, int frames, int numFrames, vector<int>& pages
 	}
 }
 
-// Driver code
 int main(int argc, char *argv[]){
 
     int numPages, numFrames, numBlocks;
