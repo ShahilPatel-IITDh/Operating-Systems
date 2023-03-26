@@ -9,8 +9,6 @@
  *   do_lseek:  perform the LSEEK system call
  */
 
-// Assignment 6
-#include <string.h>
 #include "fs.h"
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -116,8 +114,9 @@ int common_open(char path[PATH_MAX], int oflags, mode_t omode)
 		vp = new_node(&resolve, oflags, omode);
 		r = err_code;
 //-------------------------------------------------------------------------------------		
+		// Assignment-9
 		if (r == OK){
-			// Assignment-9
+			// original code->  // exist = FALSE;	/* We just created the file */
 			// Check if the file is created in /home directory
 			// If yes, print the inode number of the file
 			// If no, do nothing
@@ -125,8 +124,9 @@ int common_open(char path[PATH_MAX], int oflags, mode_t omode)
 			struct vmnt *vmpPath;
 			// find_vmnt returns the vmnt structure of the file system, in which the file is created
 			vmpPath = find_vmnt(vp->v_fs_e);
-			if (strcmp(vmpPath->m_mount_path, "/home") == 0)
+			if (strcmp(vmpPath->m_mount_path, "/home") == 0){
 				printf("200010039: file created: %llu\n", vp->v_inode_nr);
+			}
 		}
 //-------------------------------------------------------------------------------------
 

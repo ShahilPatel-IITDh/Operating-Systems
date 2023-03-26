@@ -165,14 +165,13 @@ int do_unlink(void)
 
   upgrade_vmnt_lock(vmp);
 //-------------------------------------------------------------------------------------
-  // Assignment 6
+  // Assignment-9
   lookup_init(&stickycheck, resolve.l_path, PATH_RET_SYMLINK, &vmp2, &vp);
   stickycheck.l_vmnt_lock = VMNT_READ;
   stickycheck.l_vnode_lock = VNODE_READ;
   vp = advance(dirp, &stickycheck, fp);
   
   // Printing the inode
-  // Assignment-9
   
   // vmp is the vmnt (mount point of the directory) of the directory, vp is the vnode of the file, vmp->m_mount_path is the path of the directory and if the path is /home then print the inode number (vp->v_inode_nr).
   // %llu is used to print the inode number because it is of type long long unsigned int.

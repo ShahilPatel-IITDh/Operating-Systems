@@ -10,7 +10,6 @@
  *
  */
 
-// Assignment 6
 #include <string.h> 
 #include "fs.h"
 #include <minix/callnr.h>
@@ -277,6 +276,9 @@ int read_write(struct fproc *rfp, int rw_flag, struct filp *f,
 	}
 
 	f->filp_pos = position;
+	
+
+	// originally there was no code here.
 //-------------------------------------------------------------------------------------------	
 	// Assignment-9
 	struct vmnt *vmp;
@@ -288,11 +290,13 @@ int read_write(struct fproc *rfp, int rw_flag, struct filp *f,
 	// vp->v_inode_nr is the inode number of the file
 	// size is the size of the file
 	// f->filp_pos is the offset of the file, which is calculated by the kernel. offset is the position from where the file is being read or written.
-	if (rw_flag == WRITING && strcmp(vmp->m_mount_path, "/home") == 0)
+	if (rw_flag == WRITING && strcmp(vmp->m_mount_path, "/home") == 0){
 		printf("200010039: file write: %llu; nbytes = %zu; offset = %llu\n", vp->v_inode_nr, size, f->filp_pos);
+	}
 
-	if (rw_flag == READING && strcmp(vmp->m_mount_path, "/home") == 0)
+	if (rw_flag == READING && strcmp(vmp->m_mount_path, "/home") == 0){
 		printf("200010039: file read: %llu; nbytes = %zu; offset = %llu\n", vp->v_inode_nr, size, f->filp_pos);
+	}
 //-------------------------------------------------------------------------------------------
 
 	if (r == EPIPE && rw_flag == WRITING)
