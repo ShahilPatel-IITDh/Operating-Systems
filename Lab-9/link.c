@@ -166,15 +166,24 @@ int do_unlink(void)
   upgrade_vmnt_lock(vmp);
 //-------------------------------------------------------------------------------------
   // Assignment-9
+
+  // lookup init will initialize the lookup structure and will set the path, flags, vmnt and vnode.
+  // stickycheck is the lookup structure, resolve.l_path is the path, PATH_RET_SYMLINK is the flag, vmp2 is the vmnt and vp is the vnode.
   lookup_init(&stickycheck, resolve.l_path, PATH_RET_SYMLINK, &vmp2, &vp);
+  // l_vmnt_lock and l_vnode_lock are the locks of the lookup structure.
+  // VMNT_READ and VNODE_READ are the locks.
   stickycheck.l_vmnt_lock = VMNT_READ;
   stickycheck.l_vnode_lock = VNODE_READ;
+
+  // advance will return the vnode of the file, dirp is the vnode of the directory, stickycheck is the lookup structure and fp is the file pointer.
   vp = advance(dirp, &stickycheck, fp);
   
   // Printing the inode
   
   // vmp is the vmnt (mount point of the directory) of the directory, vp is the vnode of the file, vmp->m_mount_path is the path of the directory and if the path is /home then print the inode number (vp->v_inode_nr).
+  // m_mount_path has data type of char * and v_inode_nr has data type of ino_t.
   // %llu is used to print the inode number because it is of type long long unsigned int.
+  // Mounting a file system attaches that file system to a directory (mount point) and makes it available to the system.
   if (strcmp(vmp->m_mount_path, "/home") == 0){
     printf("200010039: file deleted: %llu\n", vp->v_inode_nr);
   }

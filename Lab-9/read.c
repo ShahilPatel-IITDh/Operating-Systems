@@ -277,13 +277,12 @@ int read_write(struct fproc *rfp, int rw_flag, struct filp *f,
 
 	f->filp_pos = position;
 	
-
-	// originally there was no code here.
 //-------------------------------------------------------------------------------------------	
 	// Assignment-9
+	// vmp is the mount point of the file
 	struct vmnt *vmp;
 	// here we are checking if the file is in /home directory or not, if yes then we are printing the file name, offset and size of the file
-	// vmp is the mount point of the file
+	// v_fs_e is the file system endpoint of the file
 	vmp = find_vmnt(vp->v_fs_e);
 	// rw_flag is the flag which tells us whether the file is being read or written, if rw_flag == WRITING then file is being written, if rw_flag == READING then file is being read, here for assignment-9 we are only interested in file write and file read.
 	// strcmp is used to compare the mount point of the file with /home, if it is equal then we are printing the file name, offset and size of the file
