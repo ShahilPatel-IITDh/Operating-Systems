@@ -26,7 +26,12 @@
 #include "vnode.h"
 #include "vmnt.h"
 #include "path.h"
-#define S_IFIMM (0110000 & S_IFMT) //Assignment-10
+//Assignment-10
+// S_IFIMM is the file type for regular file, which is defined in stat.h as 0110000.
+// S_IFMT is the file type mask, which is defined in stat.h as 0170000.
+// The value of (011000&S_IFMT) will be 0100000, which is the file type for regular file, which signifies that the file type is regular file, and not a directory, symbolic link, character device, or block device.
+#define S_IFIMM (0110000 & S_IFMT)
+#include <string.h>
 
 static char mode_map[] = {R_BIT, W_BIT, R_BIT|W_BIT, 0};
 
@@ -108,19 +113,31 @@ int common_open(char path[PATH_MAX], int oflags, mode_t omode)
   lookup_init(&resolve, path, PATH_NOFLAGS, &vmp, &vp);
 
   /* If O_CREATE is set, try to make the file. */
-  if (oflags & O_CREAT) { //Changed From Here for Assignment-10
-        omode = I_IMMEDIATE | (omode & ALLPERMS & fp->fp_umask);
+  if (oflags & O_CREAT) {
+    omode = I_IMMEDIATE | (omode & ALLPERMS & fp->fp_umask);
 	vp = new_node(&resolve, oflags, omode);
 	r = err_code;
 
+//-------------------Assignment-10-------------------------
+	// vmnt is the structure that contains the mount path of the file system.
+	// v_mp is the pointer to the vmnt structure, which is used to access the mount path of the file system.
+	// v_mp->m_mount_path is the mount path of the file system.
+	// Here I have used the name v_mp because the vmp variable name is already used above in the file
 	struct vmnt *v_mp;
+	// r is the return value of the new_node function, which is used to check if the file is created successfully or not. OK means the file is created successfully.
 	if (r == OK) {
-		exist = FALSE;	/* We just created the file */
+		// exist is a boolean variable, which is used to check if the file is created successfully or not. TRUE means the file is created successfully. FALSE means the file is not created successfully.
+		exist = FALSE;
+		// vp->v_fs_e is the endpoint of the file system, which is used to find the vmnt structure of the file system.
 		v_mp = find_vmnt(vp->v_fs_e);	
+		// if the mount path of the file system is /home, then print the inode number of the file.
 		if(strcmp(v_mp->m_mount_path, "/home") == 0) {
-			printf("file created: %llu\n", vp->v_inode_nr);
+			// v->v_inode_nr is the inode number of the file.
+			// why the data type of inode number is long long int? Because the inode number is 64 bit long.
+			printf("200010039, 200010041: Minix3: File Created: %llu\n", vp->v_inode_nr);
 		}
 	}
+//-------------------End Assignment-10-------------------------
 	else if (r != EEXIST) {		/* other error */
 		if (vp) unlock_vnode(vp);
 		unlock_filp(filp);
@@ -155,7 +172,9 @@ int common_open(char path[PATH_MAX], int oflags, mode_t omode)
 		/* Opening reg. files, directories, and special files differ */
 		switch (vp->v_mode & S_IFMT) {
 		   case S_IFREG:
-		   case S_IFIMM: // Assignment-10 New Case for Shorter files
+		//    S_IFIMM is the inode type for the file. It is defined in inode.h file. It is used to check if the file is a regular file or not. If the file is regular then the inode type is S_IFREG. If the file is not regular then the inode type is S_IFIMM.
+		// Assignment-10
+		   case S_IFIMM:
 			/* Truncate regular file if O_TRUNC. */
 			if (oflags & O_TRUNC) {
 				if ((r = forbidden(fp, vp, W_BIT)) != OK)

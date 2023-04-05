@@ -99,7 +99,11 @@
 #define I_UNIX_SOCKET	0140000 /* unix domain socket */
 #define I_SYMBOLIC_LINK 0120000	/* file is a symbolic link */
 #define I_REGULAR       0100000	/* regular file, not dir or special */
-#define I_IMMEDIATE     0110000	/* immmediate file */ //LAB 7 Changes
+// Assignment-10
+// I_IMMEDIATE is not used in the kernel, but it is used in the user space. 
+// So, we need to define it here.
+// The significance of the value 0110000 is that it is the same as the value of I_SYMBOLIC_LINK.
+#define I_IMMEDIATE     0110000	/* immmediate file */ 
 #define I_BLOCK_SPECIAL 0060000	/* block special file */
 #define I_DIRECTORY     0040000	/* file is a directory */
 #define I_CHAR_SPECIAL  0020000	/* character special file */

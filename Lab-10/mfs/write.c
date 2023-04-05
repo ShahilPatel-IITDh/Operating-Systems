@@ -45,12 +45,18 @@ int op;				/* special actions */
   register block_t b;
   long excess, zone;
   struct buf *bp_dindir = NULL, *bp = NULL;
-
+//------------Assignment-10-------------------------------------
+// rip is a pointer to the inode to be changed, which is the inode of the file.
+// position is the file address to be mapped.
+// the value of the rip->i_mode is 0100000 octal.
+// The value of I_Type is 0170000 octal.
+// The value of I_IMMEDIATE is 0100000 octal.
   if((rip->i_mode & I_TYPE ) == I_IMMEDIATE) {
-	//   printf("<minix3>: Immediate File");
+	// The file is an immediate file.
+	// The NO_BLOCK is defined in fs.h. It is 0. Which means the file has no blocks. As the immediate files don't have blocks.
 	  return(NO_BLOCK);
   }
-
+//------------Assignment-10-------------------------------------
   IN_MARKDIRTY(rip);
   scale = rip->i_sp->s_log_zone_size;		/* for zone-block conversion */
   	/* relative zone # to insert */

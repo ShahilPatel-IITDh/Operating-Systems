@@ -298,7 +298,7 @@ int do_truncate(void)
   resolve.l_vnode_lock = VNODE_WRITE;
 
   length = job_m_in.m_lc_vfs_truncate.offset;
-  if (length < 0) return(EINVAL);ass
+  if (length < 0) return(EINVAL);
 
   /* Temporarily open file */
   if (fetch_name(vname, vname_length, fullpath) != OK) return(err_code);
@@ -371,22 +371,7 @@ off_t newsize;
   int r;
 
   assert(tll_locked_by_me(&vp->v_lock));
-
-//------------------Assignment-10------------------------------ 
-  // S_IFMT is a mask for the file type bitfields
-  // S_ISREG is a macro that returns true if the file is a regular file
-  // S_ISFIFO is a macro that returns true if the file is a FIFO
-  // 0110000 is the octal value of the symbolic link file type
-  // EINVAL is the error code for invalid argument
-  // req_ftrunc is the function that is used to truncate the file
-  // vp->v_fs_e is the endpoint of the file system
-  // vp->v_inode_nr is the inode number of the file
-  // vp->v_size is the size of the file
-  // OK is the error code for success
-  // The octal value of the symbolic link file type is 0110000, which can be obtained by 
-  if (!(S_ISREG(vp->v_mode) || (vp->v_mode & S_IFMT) == 0110000) && !S_ISFIFO(vp->v_mode)){
-    return(EINVAL);
-  }
+  if (!S_ISFIFO(vp->v_mode) && !(S_ISREG(vp->v_mode) || (vp->v_mode & S_IFMT) == 0110000)) return(EINVAL);  //--------------Assignment-7--------------------
 
   /* We must not compare the old and the new size here: this function may be
    * called for open(2), which requires an update to the file times if O_TRUNC

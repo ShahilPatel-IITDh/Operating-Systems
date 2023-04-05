@@ -18,7 +18,9 @@ static struct buf *rahead(struct inode *rip, block_t baseblock, u64_t
 static int rw_chunk(struct inode *rip, u64_t position, unsigned off,
 	size_t chunk, unsigned left, int rw_flag, cp_grant_id_t gid, unsigned
 	buf_off, unsigned int block_size, int *completed);
-static void clean_node(struct inode *rip); //LAB 7 New function
+//------------Assignment-10-------------------------------------
+// The removeInodeEntry function is used to remove the inode entry from the inode table. inode* is the pointer to the inode table. rip is used to get the inode number. The inode number is used to get the index of the inode in the inode table. The inode table is then updated by setting the inode number to 0.
+static void removeInodeEntry(struct inode *rip);
 
 /*===========================================================================*
  *				fs_readwrite				     *
@@ -91,86 +93,151 @@ int fs_readwrite(void)
 	      
   cum_io = 0;
 
-  //LAB 7 Changes from here onwards
-  if(mode_word==I_IMMEDIATE) {
-    if(rw_flag==WRITING) {
+//------------Assignment-10-------------------------------------
+// The following code is used to check if the file is immediate file or not. If it is immediate file, then the file is read/written from/to the inode table. If the file is not immediate file, then the file is read/written from/to the disk.
+
+// the mode_word is used to check if the file is immediate file or not. If the file is immediate file, then the mode_word is set to I_IMMEDIATE. If the file is not immediate file, then the mode_word is set to I_REGULAR.
+  if(mode_word == I_IMMEDIATE) {
+    // rw_flag is used to check if the file is being read or written.
+    if(rw_flag == WRITING) {
+      // position means the offset from the beginning of the file. If the position is greater than 32, then the file is too large to be stored in the inode table.
+      // nrbytes is the number of bytes to be read/written.
+      // if the position+nrbytes is greater than 32, then the file is too large to be stored in the inode table.
       if(position + nrbytes > 32) {
+        // i is used to iterate through the file.
         int i;
-        int post=0;
+        // post is the offset from the beginning of the file. It is used to get the index of the inode table.
+        int post = 0;
+        // the temp_bytes is used to get the bytes from the inode table.
         char* temp_bytes;
-        char buffer[40]; // Maximum 40 bytes as 10 u32 i_zones present
+        // the buffer is used to store the data from the inode table.
+        char buffer[40];// Max 40 bytes as 10 u32 i_zones present
+        // buf is the buffer. bp is the pointer to the buffer. buffer is used to store the data from the inode table.
         register struct buf* bp;
         
-        for(i=0; i<f_size; ++i) { // Copying file data in i_zones to buffer.
-          if(i%4 == 0)
+        // f_size is the size of the file.
+        // Copy file data in i_zones to buffer.
+        for(i = 0; i < f_size; ++i) {
+          if(i%4 == 0){
+            // rip->i_zone + i is the pointer to the inode table.
             temp_bytes = (char*)rip->i_zone + i;
+          }
+          // buffer[i] is the data from the inode table. Assign the data to the buffer.
           buffer[i] = temp_bytes[i%4];
         }
-        clean_node(rip);
+        // removeInodeEntry is used to remove the inode entry from the inode table.
+        // rip means the pointer to the inode table.
+        removeInodeEntry(rip);
+        // rip->i_mode is the mode of the file. Set the mode of the file to I_REGULAR.
+        // rip->i_mode & ALL_MODES is used to get the mode of the file. ALL_MODES means all the modes of the file, which are I_TYPE, I_SET_UID_BIT, I_SET_GID_BIT, I_SET_STCKY_BIT, I_REGULAR, I_BLOCK_SPECIAL, I_DIRECTORY, I_CHAR_SPECIAL, I_NAMED_PIPE, I_SYMBOLIC_LINK, I_MOUNT_POINT, I_IMMEDIATE.
+        // (I_REGULAR | (rip->i_mode & ALL_MODES)) is used to set the mode of the file to I_REGULAR.
         rip->i_mode = (I_REGULAR | (rip->i_mode & ALL_MODES));
+        // I_TYPE is used to get the type of the file. I_TYPE is 0170000.
         mode_word = rip->i_mode & I_TYPE;
-        if((bp = new_block(rip, (off_t) ex64lo(post))) == NULL)
-          return(err_code);
-        for(i=0; i<f_size; ++i) {
+
+        // bp is the pointer to the buffer. new_block is used to get the new block.
+        // ex64lo(post) is used to get the index of the inode table.
+        if((bp = new_block(rip, (off_t) ex64lo(post))) == NULL){
+          // err_code is used to store the error code, which is EIO. EIO means I/O error. It has a value of 5.
+          return (err_code);
+        }
+        for(i = 0; i < f_size; ++i) {
+          // ((char*)bp->data)[i] is the data from the buffer. Assign the data to the buffer.
           ((char*)bp->data)[i] = buffer[i];
         }
+        // MARKDIRTY(bp) is used to mark the buffer as dirty, dirty means the buffer is modified.
         MARKDIRTY(bp);
+        // put_block will write the buffer to the disk, where the argument bp is the pointer to the buffer, and PARTIAL_DATA_BLOCK is the type of the buffer.
         put_block(bp, PARTIAL_DATA_BLOCK);
       }
-      else
-      {
-        immediate=1;
-      } 
+      // If the position+nrbytes is less than 32, then the file is not too large to be stored in the inode table. Thus the file is a immediate file. set the immediate to 1.
+      else{
+        immediate = 1;
+      }
     }
     else {
-    // READING IMMEDIATE
-      if(position >= f_size)
-        immediate=0;
-      else
-        immediate=1;
+      // If the position is greater than the size of the file, then the file is not too large to be stored in the inode table. Thus the file is a immediate file. set the immediate to 1.
+      if(position >= f_size){
+        immediate = 0;
+      }
+      else{
+        immediate = 1;
+      }
     }
   }
 
-  if(immediate==1) {
-    if(rw_flag==READING) {
-      printf("<Lab 7> Minix3 Reading from immediate file\n");
+  // If the file is immediate file, then the file is read/written from/to the inode table. If the file is not immediate file, then the file is read/written from/to the disk.
+  if(immediate == 1) {
+    // if the rw_flag is WRITING, then the file is being written.
+    if(rw_flag == READING) {
+      printf("200010039, 200010041: Minix3: Reading from Immediate File.\n");
+      // r is used to store the return value of sys_safecopyfrom. sys_safecopyfrom is used to copy data from a process to another process. 
+      // The arguments are:
+      // VFS_PROC_NR is the process number of the VFS (VFS = Virtual File System)
+      // gid is the grant id (grant id = a unique id for each process)
+      // (vir_bytes)cum_io is the offset from the beginning of the file (cum_io = cumulative I/O, which means the total number of bytes read/written)
+      // (vir_bytes) rip->i_zone is the pointer to the inode table (rip->i_zone = i_zone = the array of 10 u32 i_zones)
+      // (size_t) f_size is the size of the file. (f_size = file size)
       r = sys_safecopyto(VFS_PROC_NR, gid, (vir_bytes)cum_io,(vir_bytes) rip->i_zone,(size_t) f_size);
       
       int i;
-      int post=0;
+      int post = 0;
       char* temp_bytes;
       char buffer[40];// Max 40 bytes as 10 u32 i_zones present
-      for(i=0; i<f_size; ++i) {// Copy file data in i_zones to buffer.
+      // Copy file data in i_zones to buffer
+      for(i=0; i<f_size; ++i) {
         if(i%4 == 0)
           temp_bytes = (char*)rip->i_zone + i;
         buffer[i] = temp_bytes[i%4];
       }
 
-      printf("<Lab 7> Minix3 Immediate File contents:\n");
-      for(i=0; i<f_size; ++i) {
+      printf("200010039, 200010041: Minix3: File Contentsof Immediate File:\n");
+      // Print the file contents, which is stored in the buffer.
+      for(i = 0; i < f_size; ++i) {
         printf("%c", buffer[i]);
       }
-      printf("<Lab 7> Minix3 EOF Immediate File\n");
+      printf("200010039, 200010041: Minix3: EOF - Immediate File\n");
       
-      if(r==OK) {
+      // if r is OK, then the file is read successfully.
+      if(r == OK) {
+        // nrbytes is the number of bytes to be read. Set nrbytes to 0. because the file is read successfully.
         nrbytes=0;
+        // cum_io is the cumulative I/O, which means the total number of bytes read/written. cum_io is the offset from the beginning of the file.
         cum_io += f_size;
+        // Position is the offset from the beginning of the file. Add the size of the file to the position.
         position += f_size;
       }
     }
+    // else if the rw_flag is WRITING, then the file is being written.
     else {
-      printf("<Lab 7> Minix3 Writing to immediate file\n");
+      printf("200010039, 200010041: Minix3: Writing to Immediate File.\n");
+      // vir_bytes zone is used to store the pointer to the inode table. zone is the pointer to the inode table.
       vir_bytes zone;
+      // rip->i_zone means the array of 10 u32 i_zones. zone = (vir_bytes) rip->i_zone means the pointer to the inode table.
       zone = (vir_bytes) rip->i_zone;
+      // r is used to store the return value of sys_safecopyfrom. sys_safecopyfrom is used to copy data from a process to another process.
+      // VFS_PROC_NR is the process number of the VFS (VFS = Virtual File System)
+      // gid is the grant id (grant id = a unique id for each process)
+      // (vir_bytes)cum_io is the offset from the beginning of the file (cum_io = cumulative I/O, which means the total number of bytes read/written)
+      // zone+position is the pointer to the inode table + the offset from the beginning of the file.
+      // (size_t) f_size is the size of the file. (f_size = file size)
       r = sys_safecopyfrom(VFS_PROC_NR, gid, (vir_bytes)cum_io, zone+position, (size_t) nrbytes);
+      // IN_MARKDIRTY(rip) is used to mark the inode as dirty. The inode is marked as dirty, which means the inode is modified.
+      // rip is the pointer to the inode.
       IN_MARKDIRTY(rip);
-      if(r==OK) {
+      // if the r is OK, then the file is written successfully.
+      if(r == OK) {
+        // cum_io is the cumulative I/O, which means the total number of bytes read/written. cum_io is the offset from the beginning of the file.
         cum_io += nrbytes;
+        // position is the offset from the beginning of the file. Add the number of bytes to the position.
+        // (off_t) is used to convert the nrbytes to off_t, which is a data type used to store the offset from the beginning of the file.
         position += (off_t)nrbytes;
+        // nrbytes is the number of bytes to be read. Set nrbytes to 0. because the file is written successfully.
         nrbytes = 0;
       }
     }
   }
+//------------End of Assignment-10-------------------------------------
 
   /* Split the transfer into chunks that don't span two blocks. */
   while (nrbytes > 0) {
@@ -225,21 +292,36 @@ int fs_readwrite(void)
   
   return(r);
 }
-
+//--------------------------Assignment-10-------------------------------------
 /*===========================================================================*
- *				clean_node			     * //LAB 7 
+ *				removeInodeEntry			     *
  *===========================================================================*/
-static void clean_node(rip)
-register struct inode *rip; /*inode to be erased */
-{
+static void removeInodeEntry(rip)
+// This function is used to remove the inode entry.
+register struct inode *rip; /*inode to be erased */{
+  // i is used to store the index of the inode table.
+  // The keyword register hints to compiler that a given variable can be put in a register. It’s compiler’s choice to put it in a register or not.
   register int i;
-  rip->i_size=0;
+  // rip is the pointer to the inode.
+  // rip->i_size is the size of the file. Set rip->i_size to 0.
+  rip->i_size = 0;
+  // rip->i_update is used to store the time of the inode.
+  // ATIME means the access time of the inode.
+  // CTIME means the change time of the inode.
+  // MTIME means the modification time of the inode.
   rip->i_update = ATIME | CTIME | MTIME; 
+  // IN_MARKDIRTY(rip) is used to mark the inode as dirty. The inode is marked as dirty, which means the inode is modified.
   IN_MARKDIRTY(rip);
-  for(i=0; i<V2_NR_TZONES; ++i)
+  // VR_NR_TZONES is the number of zones in the inode table.
+  for(i = 0; i < V2_NR_TZONES; ++i){
+    // Zone number is the number of the zone in the disk, such as 
+    // rip->i_zone[i] is used to store the zone number of the inode.
+    // NO_ZONE means the zone number is not valid.
+    // Set rip->i_zone[i] to NO_ZONE.
     rip->i_zone[i] = NO_ZONE;
+  }
 }
-
+//-------------------End of Assignment-10-------------------------------------
 /*===========================================================================*
  *				fs_breadwrite				     *
  *===========================================================================*/

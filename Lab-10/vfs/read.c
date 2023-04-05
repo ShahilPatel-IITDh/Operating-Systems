@@ -23,7 +23,9 @@
 #include "scratchpad.h"
 #include "vnode.h"
 #include "vmnt.h"
+//--------------Assignment-10------------------
 #include <string.h>
+
 
 /*===========================================================================*
  *				do_read					     *
@@ -247,18 +249,26 @@ int read_write(struct fproc *rfp, int rw_flag, struct filp *f,
   }
 
   f->filp_pos = position;
+//--------------------------------Assignment-10---------------------------------------------------------
+	// vmnt is a structure that contains the mount path of the file system, which is used to identify the file system. vmp is a pointer to the vmnt structure. Which will be used to access the mount path of the file system.
+	struct vmnt *vmp;
+	// find the vmnt structure of the file system, v_fs_e is the endpoint of the file system.
+	vmp = find_vmnt(vp->v_fs_e);	
+	// rw_flag is a flag that is used to identify whether the file is being read or written. If it is read, then the value of rw_flag is 0, and if it is written, then the value of rw_flag is 1.
+	// m_mount_path is the mount path of the file system. vmp->m_mount_path is used to access the mount path of the file system.
+	// value of rw_flag will be 1, which means that the file is being written.
+	if (rw_flag == WRITING && strcmp(vmp->m_mount_path, "/home") == 0) {
+		// v_inode_nr is the inode number of the file. vp->v_inode_nr is used to access the inode number of the file.
+		// size is the number of bytes to be read or written. position is the offset from the beginning of the file.
+		// position is the offset from the beginning of the file.
+		printf("200010039, 200010041: Minix3: File Write: %llu; nbytes = %zu; offset = %llu\n", vp->v_inode_nr, size, position);
+	}
 
-  //Change here for Read and Write
-  struct vmnt *vmp;
-  vmp = find_vmnt(vp->v_fs_e);
-  if (rw_flag == WRITING && strcmp(vmp->m_mount_path, "/home") == 0)
-  {
-	printf("file written: %llu; nbytes = %zu; offset = %llu\n", vp->v_inode_nr, size, f->filp_pos);
-  }
-  if (rw_flag == READING && strcmp(vmp->m_mount_path, "/home") == 0)
-  {
-  	printf("file read: %llu; nbytes = %zu; offset = %llu\n", vp->v_inode_nr, size, f->filp_pos);
-  }
+	// here the value of rw_flag will be 0, which means that the file is being read.
+	if (rw_flag == READING && strcmp(vmp->m_mount_path, "/home") == 0) {
+		printf("200010039, 200010041: Minix3: File Read: %llu; nbytes = %zu; offset = %llu\n", vp->v_inode_nr, size, position);
+	}
+//--------------------------------End of Assignment-10------------------------------------
 
   if (r == EPIPE && rw_flag == WRITING) {
 	/* Process is writing, but there is no reader. Tell the kernel to

@@ -49,7 +49,12 @@ int block_size;
 uint8_t fs_mode_to_type(mode_t mode)
 {
 	if(S_ISREG(mode)) return DT_REG;
-	else if( (((mode) & 0170000) == (0110000))	) return DT_REG; //LAB 7 Changes
+	// mode & 0170000 is the file type. 0110000 is the file type for regular file.
+	else if(((0110000) == ((mode) & 0170000))){
+		// DT_REG is the file type for regular file, which is defined in dirent.h as 8.
+		// It has been assigned value of 8 because it is the 8th file type.
+		return DT_REG;
+	} //-----------Assignment-10-------------------------------------
 	else if(S_ISDIR(mode)) return DT_DIR;
 	else if(S_ISLNK(mode)) return DT_LNK;
 	else if(S_ISCHR(mode)) return DT_CHR;
