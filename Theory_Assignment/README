@@ -1,0 +1,6 @@
+To run the code use the following commands:
+
+"g++ 200010039.cpp -o 200010039"
+"./200010039 <input_file_name>"
+
+The input testcases are: 'input1.txt', 'input2.txt', 'input3.txt', 'input4.txt', 'input5.txt'
