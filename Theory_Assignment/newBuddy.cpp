@@ -13,7 +13,7 @@ struct Block{
 };
 
 Block generateBlock(int size, bool occupied, char process) {
-    Block block;
+    Block block ;
     block.size = size;
     block.occupied = occupied;
     block.process = process;
@@ -65,36 +65,56 @@ void processRequest(vector<Block> &memory, char process, int size) {
     }
 }
 
+void printState(const vector<Block> &memory) {
+    for (const Block &block : memory) {
+        if (block.occupied) {
+            cout << block.process << " : " << block.size << endl;
+        }
+        else {
+            cout << "Free Block : " << block.size << endl;
+        }
+    }
+}
+
 int main() {
     int testCases;
     cin >> testCases;
     while (testCases--){
-
-        int U;
-        int L;
+        int U, L;
         cin >> U >> L;
-
         vector<Block> memory = {generateBlock(pow(2, U), false, '-')};
 
         string requestLine;
-        getline(cin, requestLine);
+        getline(cin, requestLine); // consume the newline after U and L
 
+        map<char, int> processSizes;
         while (getline(cin, requestLine) && !requestLine.empty()) {
             char process = requestLine[0];
             int size = stoi(requestLine.substr(2));
-            processRequest(memory, process, size);
-        }
-
-        for (const Block &block : memory) {
-            if (block.occupied) {
-                cout << block.process << ": " << block.size << endl;
+            if (size == 0) {
+                processSizes.erase(process);
             }
             else {
-                cout << "Free Block: " << block.size << endl;
+                processSizes[process] = size;
             }
-        }
-        if (testCases) {
-            cout << endl;
+
+            int target_size = 0;
+            for (const auto &p : processSizes) {
+                target_size = max(target_size, p.second);
+            }
+
+            bool allocated = false;
+            for (int i = memory.size() - 1; i >= 0; i--) {
+                if (!memory[i].occupied && memory[i].size >= target_size) {
+                    processRequest(memory, process, target_size);
+                    allocated = true;
+                    break;
+                }
+            }
+
+            if (!allocated) {
+                cout << "Unable to allocate memory for process " << process << endl;
+            }
         }
     }
     return 0;
