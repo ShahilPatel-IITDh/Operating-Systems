@@ -156,7 +156,8 @@ int fs_readwrite(void)
       }
     }
     else {
-      // If the position is greater than the size of the file, then the file is not too large to be stored in the inode table. Thus the file is a immediate file. set the immediate to 1.
+      // If the position is greater than f_size it means that the file is too large to be stored in the inode table. Thus the file is not a immediate file. set the immediate to 0.
+      // position means the offset from the beginning of the file. If the position is greater than 32, then the file is too large to be stored in the inode table. 
       if(position >= f_size){
         immediate = 0;
       }
