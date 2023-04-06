@@ -13,6 +13,7 @@
 #define FOR(a, b, c) for (int a = b; a < c; a++)
 
 using namespace std;
+
 class Block{
     public:
         bool occupied;
