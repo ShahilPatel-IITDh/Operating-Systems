@@ -29,6 +29,7 @@ class Block{
 };
 
 
+
 void splitBlock(vector<Block> &memory, int index, int requiredSize, long long int lowerLimit) {
     if (memory[index].size >= requiredSize*2 && !memory[index].occupied) {
         // the current block is free and larger than double the requested size, so split it into two
@@ -57,20 +58,6 @@ void mergeBlocks(vector<Block> &memory){
     }
 }
 
-int nearestPowerOf2(int n){
-    int x = (int) ceil(log2(n));
-    return (int)pow(2, x);
-}
-
-int findLowestBlock(int index, vector<Block> &memory, int givenSize, long long int lowerLimit){
-    for(int i=0; i<memory.size(); i++){
-        if(memory[i].occupied == false && memory[i].size == givenSize){
-            index = i;
-            break;
-        }
-    }
-}
-
 void processRequest(vector<Block> &memory, char processName, int givenSize, long long int lowerLimit){
     // if the size is zero, then we need to free the block
     if(givenSize == 0){
@@ -90,14 +77,14 @@ void processRequest(vector<Block> &memory, char processName, int givenSize, long
         int index = -1;
         for (int i = 0; i < memory.size(); i++) {
             // if the size of the block is greater than or equal to the given size and the block is free, then we can allocate the block
-            if (memory[i].occupied==false && memory[i].size == nearestPowerOf2(givenSize)) {
+            if (memory[i].occupied==false && memory[i].size >= givenSize) {
                 // set the index of the block
                 index = i;
                 break;
             }
         }
         if (index == -1){
-            findLowestBlock(memory, givenSize, lowerLimit)
+            // cout << "No block available for process " << processName << endl;
             return;
         }
         else {
