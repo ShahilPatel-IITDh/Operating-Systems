@@ -1,147 +1,98 @@
 #include <iostream>
-#include <unordered_map>
+#include <cmath>
 #include <vector>
-#include <stack>
-#include <algorithm>
+#include <map>
+#include <string>
 
 using namespace std;
 
-class BuddyManager {
-public:
-    BuddyManager(int u, int l) : U(u), L(l), n((1 << u) - 1), free(n + 1, true), size(n + 1) {
-        for (int i = 0; i <= n; ++i) {
-            size[i] = 1 << (U - i + L - 1);
-        }
-    }
-
-    void allocate(char pid, int s) {
-        int k = ceil_log2(s + L);
-        int i = first_fit(k);
-        if (i == -1) {
-            throw runtime_error("memory allocation failed");
-        }
-        split(i, k);
-        allocated[pid] = i;
-        free[i] = false;
-    }
-
-    void deallocate(char pid) {
-        int i = allocated[pid];
-        free[i] = true;
-        coalesce(i);
-        allocated.erase(pid);
-    }
-
-    void print_state() const {
-        cout << "Processes:" << endl;
-        for (const auto& entry : allocated) {
-            char pid = entry.first;
-            int i = entry.second;
-            int s = size[i] - L;
-            cout << pid << " : " << s << endl;
-        }
-        cout << "Free Blocks:" << endl;
-        vector<pair<int, int>> blocks;
-        for (int i = 0; i <= n; ++i) {
-            if (free[i]) {
-                int s = size[i] - L;
-                blocks.push_back({i, s});
-            }
-        }
-        sort(blocks.begin(), blocks.end());
-        for (const auto& block : blocks) {
-            int i = block.first;
-            int s = block.second;
-            cout << "Free Block : " << s << endl;
-        }
-    }
-
-private:
-    int U, L, n;
-    vector<bool> free;
-    vector<int> size;
-    unordered_map<char, int> allocated;
-
-    int ceil_log2(int x) const {
-        int k = 0;
-        while ((1 << k) < x) {
-            ++k;
-        }
-        return k;
-    }
-
-    int first_fit(int k) const {
-        int i = 0;
-        while (i <= n) {
-            if (free[i] && size[i] >= (1 << (U - k + L))) {
-                return i;
-            }
-            ++i;
-        }
-        return -1;
-    }
-
-    void split(int i, int k) {
-        while (size[i] > (1 << (U - k + L))) {
-            int j = i + (1 << (k - 1));
-            free[j] = true;
-            size[j] = size[i] / 2;
-            size[i] = size[j];
-            k--;
-        }
-    }
-
-    void coalesce(int i) {
-        int k = ceil_log2(size[i] + L);
-        while (true) {
-            int j = i ^ (1 << (U - k + L));
-            if (j > n || !free[j]) {
-                break;
-            }
-            free[i] = true;
-            free[j] = true;
-            size[i] += size[j];
-            i = min(i, j);
-            k++;
-        }
-    }
+struct Block{
+    bool occupied;
+    int size;
+    char process;
 };
 
-int main() {
-    int num_cases;
-    cin >> num_cases;
-    
-    // Process each test case
-    for (int i = 0; i < num_cases; i++) {
-        int upper_size, lower_size;
-        cin >> upper_size >> lower_size;
+Block generateBlock(int size, bool occupied, char process) {
+    Block block;
+    block.size = size;
+    block.occupied = occupied;
+    block.process = process;
+    return block;
+}
 
-        // Initialize buddy memory manager
-        BuddyManager buddy(upper_size, lower_size);
+void splitBlock(vector<Block> &memory, int index, int target_size) {
+    while (memory[index].size > target_size) {
+        memory.insert(memory.begin() + index + 1, generateBlock(memory[index].size / 2, false, '-'));
+        memory[index].size /= 2;
+    }
+}
 
-        string line;
-        getline(cin, line); // consume blank line
-
-        while (getline(cin, line) && !line.empty()) {
-            char process_id;
-            int request_size;
-            stringstream ss(line);
-            ss >> process_id >> request_size;
-
-            if (request_size == 0) {
-                buddy.release(process_id);
-            } else {
-                buddy.allocate(process_id, request_size);
-            }
-        }
-
-        // Print current state of buddy memory
-        cout << "Case " << i+1 << ":\n";
-        buddy.print_state();
-        if (i != num_cases - 1) {
-            cout << endl; // print blank line between cases
+void merge_blocks(vector<Block> &memory) {
+    for (int i = 0; i < memory.size() - 1;) {
+        if (!memory[i].occupied && !memory[i + 1].occupied && memory[i].size == memory[i + 1].size) {
+            memory[i].size *= 2;
+            memory.erase(memory.begin() + i + 1);
+        } else {
+            i++;
         }
     }
+}
 
+void processRequest(vector<Block> &memory, char process, int size) {
+    if (size == 0) {
+        for (Block &block : memory) {
+            if (block.process == process) {
+                block.occupied = false;
+                block.process = '-';
+                break;
+            }
+        }
+        merge_blocks(memory);
+    } else {
+        int index = -1;
+        for (int i = memory.size() - 1; i >= 0; i--) {
+            if (!memory[i].occupied && memory[i].size >= size) {
+                index = i;
+            }
+        }
+        if (index != -1) {
+            splitBlock(memory, index, size);
+            memory[index].occupied = true;
+            memory[index].process = process;
+        }
+    }
+}
+
+int main() {
+    int testCases;
+    cin >> testCases;
+    while (testCases--){
+
+        int U;
+        int L;
+        cin >> U >> L;
+
+        vector<Block> memory = {generateBlock(pow(2, U), false, '-')};
+
+        string requestLine;
+        getline(cin, requestLine);
+
+        while (getline(cin, requestLine) && !requestLine.empty()) {
+            char process = requestLine[0];
+            int size = stoi(requestLine.substr(2));
+            processRequest(memory, process, size);
+        }
+
+        for (const Block &block : memory) {
+            if (block.occupied) {
+                cout << block.process << ": " << block.size << endl;
+            } else {
+                cout << "Free Block: " << block.size << endl;
+            }
+        }
+        if (testCases) {
+            cout << endl;
+        }
+    }
     return 0;
 }
