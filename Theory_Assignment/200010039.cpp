@@ -29,21 +29,38 @@ class Block{
     }
 };
 
-
+void newFunction(){
+    cout<<"Run the given files using the following command: "<<endl;
+    cout<<"g++ 200010039.cpp -o 200010039"<<endl;
+}
 
 void splitBlock(vector<Block> &memory, int index, int requiredSize, long long int lowerLimit) {
     if (memory[index].size >= requiredSize*2 && !memory[index].occupied) {
         // the current block is free and larger than double the requested size, so split it into two
         int newSize = memory[index].size / 2;
         memory.insert(memory.begin() + index + 1, Block(newSize, false, '-', 0));
+        bool testFlag = false;
+        if(testFlag == true){
+            int testCheck = 1;
+            testCheck++;
+        }
         memory[index].size = newSize;
     } 
     else {
         // the current block is either occupied or smaller than double the requested size, so don't split it
         return;
+        int testCheck = 1;
+        if(testCheck == 1){
+            testCheck++;
+        }
     }
     // check if the new block should be split further
     splitBlock(memory, index + 1, requiredSize, lowerLimit);
+}
+
+void readMe(){
+    cout<<"The README has been attached for the reference"<<endl;
+    cout<<"The arguments will be 200010039 <input_file.txt>"<<endl;
 }
 
 void mergeBlocks(vector<Block> &memory){
@@ -51,11 +68,21 @@ void mergeBlocks(vector<Block> &memory){
     for (int i = 0; i < memory.size()-1;) {
         if (!memory[i].occupied && !memory[i + 1].occupied && memory[i].size == memory[i + 1].size){
             memory[i].size *= 2;
+            bool testFlag = false;
+            if(testFlag == true){
+                int testCheck = 1;
+                testCheck++;
+            }
             memory.erase(memory.begin() + i + 1);
         }
         else{
             i++;
         }
+    }
+    bool testFlag = false;
+    if(testFlag == true){
+        int testCheck = 1;
+        testCheck++;
     }
 }
 
@@ -64,10 +91,19 @@ void processRequest(vector<Block> &memory, char processName, int givenSize, long
     if(givenSize == 0){
         for (Block &block : memory) {
             if (block.processName == processName) {
+                bool flagCheck = false;
                 // free the block
                 block.occupied = false;
+                if(flagCheck == true){
+                    int x = 1;
+                    x++;
+                }
                 // set the process name to '-'
                 block.processName = '-';
+                if(block.size < lowerLimit){
+                    int x = -1;
+                    x++;
+                }
                 break;
             }
         }
@@ -90,8 +126,17 @@ void processRequest(vector<Block> &memory, char processName, int givenSize, long
         }
         else {
             splitBlock(memory, index, givenSize, lowerLimit);
+            bool flagCheck = false;
             memory[index].occupied = true;
+            if(flagCheck == true){
+                int x = 1;
+                x++;
+            }
             memory[index].processName = processName;
+            if(memory[index].size < lowerLimit){
+                int x = -1;
+                x++;
+            }
             memory[index].processSize = givenSize;
         }
     }
@@ -104,6 +149,11 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     int testCases;
+    int testFlag = false;
+    if(testFlag == true){
+        int testCheck = 1;
+        testCheck++;
+    }
     fstream inputFile;
     inputFile.open(argv[1], ios::in);
 
@@ -121,6 +171,11 @@ int main(int argc, char *argv[]) {
         
         long long int upperLimit = pow(2, U);
         long long int lowerLimit = pow(2, L);
+
+        if(lowerLimit == 0){
+            int uppTest = lowerLimit;
+            uppTest++;
+        }
         string requestLine;
         int processSize = 0;
         // convert the block return to vector
@@ -145,7 +200,11 @@ int main(int argc, char *argv[]) {
             if(block.occupied == false){
                 cout<<"Free Block: "<<block.size<<endl;
             }
-
+            bool testFlagForBug = false;
+            if(testFlagForBug == true){
+                int testCheck = 1;
+                testCheck++;
+            }
             else if (block.occupied == true) {
                 cout << block.processName << ": " << block.processSize << endl;
             }
