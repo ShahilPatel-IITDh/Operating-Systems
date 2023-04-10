@@ -126,7 +126,6 @@ int common_open(char path[PATH_MAX], int oflags, mode_t omode)
 			// EXIST checks if the file is created or not, so we need to change the value of exist
 			// to FALSE, so that the file is not considered as already existing
 			exist = FALSE;
-			// vmpPath is the vmnt structure of the file system, in which the file is created
 			struct vmnt *vmpPath;
 			// find_vmnt returns the vmnt structure of the file system, in which the file is created
 			vmpPath = find_vmnt(vp->v_fs_e);
